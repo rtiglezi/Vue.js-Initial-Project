@@ -304,6 +304,9 @@ export default {
       const method = this.user._id ? "patch" : "post";
       const id = this.user._id ? `/${this.user._id}` : "";
 
+      let aleatoryPass = Math.floor(Math.random() * 99999999);
+      this.user.password = aleatoryPass;
+
       this.$validator.validateAll().then(success => {
         if (!success) {
           return;
