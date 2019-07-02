@@ -1,13 +1,30 @@
 <template>
   <div class="auth-content">
     <div class="auth-modal">
-      <img src="@/assets/c-proc.png" alt="Logo" width="80" align="left">
+      <img src="@/assets/c-proc.png" alt="Logo" width="80" align="left" />
       <span class="auth-logo">ceproc</span>
-      <hr>
-      <div class="auth-title">Login</div>
-      <input v-model="user.email" type="text" placeholder="E-mail">
-      <input v-model="user.password" type="password" placeholder="Senha">
-      <button @click="signin">Entrar</button>
+
+      <hr />
+
+      <div v-if="!forgotPass" class="text-center">
+        <div class="auth-title">Login</div>
+        <input v-model="user.email" type="text" placeholder="E-mail" />
+        <input v-if="!forgotPass" v-model="user.password" type="password" placeholder="Senha" />
+        <button @click="signin" class="mb-3">Entrar</button>
+        <div>
+          <a href="#" @click="forgotPass = true">Esqueci a senha</a>
+        </div>
+       
+      </div>
+
+      <div v-if="forgotPass" class="text-center">
+        <div class="auth-title">Recuperar a Senha</div>
+        <input v-model="user.email" type="text" placeholder="E-mail" />
+        <button @click="forgot" class="mb-3">Recuperar</button>
+        <div>
+          <a href="#" @click="forgotPass = false">Voltar ao login</a>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -20,7 +37,8 @@ export default {
   name: "Auth",
   data: function() {
     return {
-      user: {}
+      user: {},
+      forgotPass: false
     };
   },
   methods: {
@@ -40,6 +58,11 @@ export default {
             showError("Credenciais inválidas.");
           }
         });
+    },
+    forgot() {
+      let email = this.user.email;
+      this.user = {};
+      window.location.href = 'http://localhost:3000/users/forgotpass/' + email + '/localhost:8081';
     }
   }
 };
@@ -64,7 +87,6 @@ export default {
   flex-direction: column;
   align-items: center;
 }
-
 
 .auth-logo {
   font-size: 1.5rem;
