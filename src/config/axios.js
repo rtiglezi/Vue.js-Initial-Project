@@ -4,7 +4,7 @@ import { userKey } from "@/global";
 const success = res => res;
 const error = err => {
   if (400 === err.response.status) {
-    alert("Não foi possível salvar o registro.\nCertifique-se de que não esteja tentando inserir um dado já existente.")
+    alert("Não foi possível realizar a operação.\n" + err)
   } else {
     return Promise.reject(err);
   }

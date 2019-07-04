@@ -19,11 +19,9 @@
       <div v-if="forgotPass" class="text-center">
         <div class="auth-title">Redefinir a Senha</div>
         <b-form-input v-model="user.email" type="text" placeholder="E-mail" />
-        <b-button @click="forgot" class="mb-3">{{ txtButton }}</b-button>
-        <div>{{txtLabel}}</div>
-        <div>
-          <a href="#" @click="forgotPass = false">Voltar ao login</a>
-        </div>
+        <div :class="lblClass">{{txtLabel}}</div>
+        <div class="mt-3"><b-button @click="forgot" class="mb-3">{{ txtButton }}</b-button></div>
+        <div><a href="#" @click="forgotPass = false">Voltar ao login</a></div>
       </div>
     </div>
   </div>
@@ -40,7 +38,8 @@ export default {
       user: {},
       forgotPass: false,
       queryEmail: "",
-      txtButton: "Redefinir"
+      txtButton: "Redefinir",
+      lblClass: ""
     };
   },
   methods: {
@@ -67,13 +66,15 @@ export default {
       const url = `${baseApiUrl}/users/forgotpass/${email}/localhost:8081`;
       axios
         .get(url)
-      .then(() => {
-          this.txtLabel = "E-mail enviado. Consulte sua caixa de mensagens."
+        .then(() => {
+          this.txtLabel = "E-mail enviado. Consulte sua caixa de mensagens.";
           this.txtButton = "Redefinir";
+          this.lblClass = "lblSuccess";
         })
         .catch(e => {
-          this.txtLabel = `Ocorreu um erro ao tentar eviar o e-mail: ${e.response.data.message}`
+          this.txtLabel = `Ocorreu um erro ao tentar eviar o e-mail: ${e.response.data.message}`;
           this.txtButton = "Tentar novamente";
+          this.lblClass = "lblErr";
         });
     }
   },
@@ -147,5 +148,13 @@ export default {
     rgba(120, 120, 120, 0.75),
     rgba(120, 120, 120, 0)
   );
+}
+
+.lblErr {
+  color: red;
+}
+
+.lblSuccess {
+  color: green;
 }
 </style>
