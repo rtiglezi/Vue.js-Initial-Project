@@ -14,13 +14,13 @@
         <div>
           <a href="#" @click="forgotPass = true">Esqueci a senha</a>
         </div>
-       
       </div>
 
       <div v-if="forgotPass" class="text-center">
-        <div class="auth-title">Recuperar a Senha</div>
-        <input v-model="user.email" type="text" placeholder="E-mail" />
-        <button @click="forgot" class="mb-3">Recuperar</button>
+        <div class="auth-title">Redefinir a Senha</div>
+        <b-form-input v-model="user.email" type="text" placeholder="E-mail" />
+        <b-button @click="forgot" class="mb-3">{{ txtButton }}</b-button>
+        <div>{{txtLabel}}</div>
         <div>
           <a href="#" @click="forgotPass = false">Voltar ao login</a>
         </div>
@@ -38,7 +38,9 @@ export default {
   data: function() {
     return {
       user: {},
-      forgotPass: false
+      forgotPass: false,
+      queryEmail: "",
+      txtButton: "Redefinir"
     };
   },
   methods: {
@@ -60,9 +62,26 @@ export default {
         });
     },
     forgot() {
-      let email = this.user.email;
-      this.user = {};
-      window.location.href = 'http://localhost:3000/users/forgotpass/' + email + '/localhost:8081';
+      this.txtButton = "Enviando...";
+      const email = this.user.email;
+      const url = `${baseApiUrl}/users/forgotpass/${email}/localhost:8081`;
+      axios
+        .get(url)
+      .then(() => {
+          this.txtLabel = "E-mail enviado. Consulte sua caixa de mensagens."
+          this.txtButton = "Redefinir";
+        })
+        .catch(e => {
+          this.txtLabel = `Ocorreu um erro ao tentar eviar o e-mail: ${e.response.data.message}`
+          this.txtButton = "Tentar novamente";
+        });
+    }
+  },
+  mounted() {
+    if (this.$route.query.email) {
+      this.forgotPass = true;
+      this.email = this.$route.query.email;
+      this.user.email = this.$route.query.email;
     }
   }
 };

@@ -90,5 +90,51 @@ body {
   position: relative;
 }
 
+.box-out {
+  background-color: #eee;
+}
+
+.box {
+  background-color: rgba(253, 253, 253, 0.9);
+  color: black;
+  font-weight: 300;
+}
+.box-ico {
+  color: #C8A741;
+  text-align: center;
+}
+
+.btn-main {
+  background-color: #037eb8;
+  color: white;
+}
+.btn-main:hover {
+  background-color: #006999;
+  color: white;
+}
+
+.table-th {
+  background-color: #8fc0df;
+  color: #333;
+  font-weight: 100;
+}
+.table-td {
+  background-color: white;
+  color: black;
+  font-size: 15px;
+}
+
+.layer-total {
+  background-color: #006999;
+  color: #333;
+  text-align: center;
+  font-weight: 100;
+  color: white;
+}
+
+.input-text {
+  border: 1px solid #ccc;
+}
+
 </style>
 

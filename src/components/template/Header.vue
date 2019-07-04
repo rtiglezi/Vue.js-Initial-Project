@@ -1,18 +1,17 @@
 <template>
   <div class="header">
-    <b-navbar toggleable="lg" class="header-nav" v-if="user">
+    <b-navbar toggleable="lg" type="dark" class="header-nav" v-if="user">
       <b-navbar-brand href="#" class="header-title" @click="navigate('/')">
-       <img src="@/assets/c-proc.png" alt="Logo" width="30">ceproc
+        <img src="@/assets/c-proc.png" alt="Logo" width="30" />ceproc
       </b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
-
         <b-navbar-nav v-if="user.profiles.indexOf('admin')!=-1">
           <b-nav-item-dropdown text="Administração">
             <template slot="button-content">
-              <i class="fa fa-cogs" style="color: black;"></i>
+              <i class="fa fa-cogs"></i>
               Administração
             </template>
             <b-dropdown-item href="#" @click="navigate('/admin/users')">
@@ -26,7 +25,6 @@
 
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
-         
           <!--
           <b-nav-form class="mr-5">
             <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
@@ -40,6 +38,9 @@
               <i class="fa fa-user admin-icon"></i>
               {{ user.name }}
             </template>
+            <b-dropdown-item href="#" @click="navigate('/admin/users/profile')">
+              <i class="fa fa-user-circle admin-icon"></i> Perfil
+            </b-dropdown-item>
             <b-dropdown-item href="#" @click="logout()">
               <i class="fa fa-sign-out admin-icon"></i> Sair
             </b-dropdown-item>
@@ -80,12 +81,12 @@ export default {
 }
 .header-nav {
   z-index: 2;
-  background-color: white;
+  background-color: #006999;
 }
 .header-title {
   font-weight: bold;
 }
 .header .admin-icon {
-   color: rgba(187, 146, 13);
+  color: #C8A741;
 }
 </style>

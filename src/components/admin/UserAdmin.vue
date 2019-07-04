@@ -304,8 +304,10 @@ export default {
       const method = this.user._id ? "patch" : "post";
       const id = this.user._id ? `/${this.user._id}` : "";
 
-      let aleatoryPass = Math.floor(Math.random() * 99999999);
-      this.user.password = aleatoryPass;
+      if (this.mode === "save") {
+        let aleatoryPass = Math.floor(Math.random() * 99999999);
+        this.user.password = aleatoryPass;
+      }
 
       this.$validator.validateAll().then(success => {
         if (!success) {
@@ -401,51 +403,4 @@ export default {
 </script>
 
 <style>
-
-.user-admin .box-out {
-  background-color: rgba(187, 146, 13, 0.1);
-}
-
-.user-admin .box {
-  background-color: rgba(253, 253, 253, 0.9);
-  color: black;
-  font-weight: 300;
-}
-.user-admin .box-ico {
-  color: rgba(187, 146, 13, 0.8);
-  text-align: center;
-}
-
-.user-admin .btn-main {
-  background-color: rgba(187, 146, 13, 0.8);
-  color: white;
-}
-.user-admin .btn-main:hover {
-  background-color: rgba(187, 146, 13);
-  color: white;
-}
-
-.user-admin .table-th {
-  background-color: rgba(187, 146, 13, 0.5);
-  color: #333;
-  font-weight: 100;
-}
-.user-admin .table-td {
-  background-color: white;
-  color: black;
-  font-size: 15px;
-}
-
-.user-admin .layer-total {
-  background-color: rgba(187, 146, 13);
-  color: #333;
-  text-align: center;
-  font-weight: 100;
-  color: white;
-}
-
-.user-admin .input-text {
-  border:1px solid rgba(187, 146, 13);
-}
-
 </style>

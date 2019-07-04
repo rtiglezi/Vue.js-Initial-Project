@@ -4,7 +4,7 @@ import Toasted from 'vue-toasted'
 Vue.use(Toasted, {
     iconPack: 'fontawesome',
     duration: 3500,
-    position: "top-right",
+    position: "bottom-center",
     theme: "bubble"
 })
 

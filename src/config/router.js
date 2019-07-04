@@ -4,10 +4,10 @@ import VueRouter from "vue-router";
 import Home from "@/components/home/Home";
 import UserAdmin from "@/components/admin/UserAdmin";
 import DivisionAdmin from "@/components/admin/DivisionAdmin";
-
 import Confirm from "@/components/admin/Confirm";
-
 import Auth from "@/components/auth/Auth";
+import Profile from "@/components/admin/Profile";
+
 
 Vue.use(VueRouter);
 
@@ -17,7 +17,8 @@ const routes = [
     path: "/",
     component: Home
   },
-  { name: "auth", path: "/auth", component: Auth },
+  { name: "auth", path: "/auth/:email?", component: Auth },
+   { name: "auth", path: "/admin/users/profile", component: Profile },
   {
     name: "userAdmin",
     path: "/admin/users",
