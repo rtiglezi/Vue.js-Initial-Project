@@ -18,7 +18,7 @@ const routes = [
     component: Home
   },
   { name: "auth", path: "/auth/:email?", component: Auth },
-   { name: "auth", path: "/admin/users/profile", component: Profile },
+   { name: "profile", path: "/admin/users/profile", component: Profile },
   {
     name: "userAdmin",
     path: "/admin/users",

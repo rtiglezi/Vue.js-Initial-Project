@@ -88,7 +88,7 @@
         responsive
         bordered
         :filter="filter"
-        :fields="fields"
+       :fields="items"
         @filtered="onFiltered"
       >
         <template slot="created_at" slot-scope="row">
@@ -157,7 +157,7 @@ export default {
       pageOptions: [5, 10, 15],
       options: [],
 
-      fields: [
+      items: [
         {
           key: "created_at",
           label: "Cadastro",

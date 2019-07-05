@@ -39,6 +39,7 @@ export default {
       forgotPass: false,
       queryEmail: "",
       txtButton: "Redefinir",
+      txtLabel: "",
       lblClass: ""
     };
   },
