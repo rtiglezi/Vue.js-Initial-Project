@@ -15,17 +15,19 @@ import router from "./config/router";
 import VueSidebarMenu from "vue-sidebar-menu";
 import "vue-sidebar-menu/dist/vue-sidebar-menu.css";
 
+import VueDraggable from "vue-draggable";
+
+Vue.use(VueDraggable);
+
 Vue.use(VueSidebarMenu);
 
-Vue.use(
-  VeeValidate,
-  { fieldsBagName: "formFields", 
-    locale: "pt_BR",
-    dictionary: {
-      pt_BR: pt_BR
-    }
+Vue.use(VeeValidate, {
+  fieldsBagName: "formFields",
+  locale: "pt_BR",
+  dictionary: {
+    pt_BR: pt_BR
   }
-);
+});
 
 Vue.config.productionTip = false;
 

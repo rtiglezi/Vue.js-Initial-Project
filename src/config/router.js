@@ -4,6 +4,9 @@ import VueRouter from "vue-router";
 import Home from "@/components/home/Home";
 import UserAdmin from "@/components/admin/UserAdmin";
 import DivisionAdmin from "@/components/admin/DivisionAdmin";
+import RequestAdmin from "@/components/admin/RequestAdmin";
+
+
 import Confirm from "@/components/admin/Confirm";
 import Auth from "@/components/auth/Auth";
 import Profile from "@/components/admin/Profile";
@@ -29,6 +32,12 @@ const routes = [
     name: "divisionAdmin",
     path: "/admin/divisions",
     component: DivisionAdmin,
+    meta: { requiresAdmin: true }
+  },
+  {
+    name: "requestAdmin",
+    path: "/admin/requests",
+    component: RequestAdmin,
     meta: { requiresAdmin: true }
   },
   {
