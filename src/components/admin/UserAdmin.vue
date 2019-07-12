@@ -119,7 +119,7 @@
           Limpar
         </b-button>
         <b-button @click="showCad = false" class="btn-list ml-4">
-          Listagem
+          {{totalRows}} registro(s)
           <i class="fa fa-arrow-right fa-lg ml-1"></i>
         </b-button>
       </div>
@@ -193,7 +193,7 @@
 
       <b-row>
         <b-col>
-          <b-button @click="showCad = true">
+          <b-button @click="refreshPage();">
             <i class="fa fa-arrow-left fa-lg mr-1"></i>Formulário
           </b-button>
         </b-col>
@@ -345,6 +345,7 @@ export default {
       const url = `${baseApiUrl}/users`;
       axios.get(url).then(res => {
         this.users = res.data;
+        this.totalRows = res.data.length;
       });
     },
     onFiltered(filteredItems) {
@@ -358,20 +359,24 @@ export default {
       if (!isCleaningForm) {
         switch (this.mode) {
           case "save":
+            this.loadUsers();
             this.$toasted.global.defaultSuccess({
-              msg: "Usuário inserido com sucesso."
+              msg: `Registro inserido com sucesso. ${this.totalRows +
+                1} registro(s) até agora.`
             });
+
             break;
           case "edit":
             this.$toasted.global.defaultSuccess({
-              msg: "Dados do usuário editados com sucesso."
+              msg: "Registro editado com sucesso."
             });
-            doRefreshPage = false;
             break;
           case "remove":
             this.$toasted.global.defaultSuccess({
-              msg: "Usuário excluído do sistema com sucesso."
+              msg: "Registro excluído do sistema com sucesso."
             });
+            this.showCad = false;
+            doRefreshPage = false;
             break;
         }
       }
@@ -379,9 +384,12 @@ export default {
       this.loadUsers();
 
       if (doRefreshPage) {
-        let msg = "Formulário pronto para nova inserção.";
-        this.$router.push(`/admin/confirm?origin=users&msg=${msg}`);
+        this.refreshPage();
       }
+    },
+    refreshPage() {
+      let msg = "Formulário pronto para nova inserção.";
+      this.$router.push(`/admin/confirm?origin=users&msg=${msg}`);
     },
     submitByKey() {
       if (this.mode === "save" || this.mode === "edit") {

@@ -1,8 +1,8 @@
 <template>
-  <draggable class="request-admin">
+  <div class="request-admin">
     <PageTitle
       icon="fa fa-paperclip"
-      main="Cadastro de Pedidos"
+      main="Cadastro de Demandas"
       sub="Área administrativa de acesso restrito"
     />
 
@@ -13,11 +13,10 @@
           <b-row>
             <b-col md="3" sm="12" class="box-ico">
               <i class="fa fa-paperclip fa-5x" aria-hidden="true"></i>
-              <br />Dados Cadastrais do
-              <br />PEDIDO
+              <br />Cadastro de Demanda
             </b-col>
             <b-col md="9" sm="12">
-              <b-form-group label="Descrição *" label-for="requestName">
+              <b-form-group label="Descrição da Demanda *" label-for="requestName">
                 <b-form-input
                   ref="requestName"
                   name="Descrição"
@@ -34,44 +33,6 @@
                   class="adm-msg-error"
                 >{{ errors.first('Descrição') }}</span>
               </b-form-group>
-            </b-col>
-          </b-row>
-        </b-card>
-      </b-card>
-
-      <b-card class="mb-2 box-out">
-        <b-card class="box">
-          <b-row>
-            <b-col md="3" sm="12" class="box-ico">
-              <i class="fa fa-flag fa-5x" aria-hidden="true"></i>
-              <br />Estágios
-              <br />
-            </b-col>
-            <b-col md="9" sm="12">
-              <draggable class="row">
-                <input type="hidden" v-model="request.stages" />
-
-                <draggable class="col-12">
-                  
-                  <div class="btn btn-link button" @click="add">
-                    <i class="fa fa-plus mr-1"></i>adicionar estágio
-                  </div>
-
-                  <draggable tag="ul" :list="list" class="list-group" handle=".handle">
-                    <li
-                      class="list-group-item mt-1 mb-1"
-                      v-for="(element, idx) in list"
-                      :key="element.position"
-                    >
-                      <i class="fa fa-align-justify handle mr-3"></i>
-
-                      <input type="text" class="form-control" style="width: 85%" v-model="element.name" />
-
-                      <i class="fa fa-times close" @click="removeAt(idx)"></i>
-                    </li>
-                  </draggable>
-                </draggable>
-              </draggable>
             </b-col>
           </b-row>
         </b-card>
@@ -95,7 +56,7 @@
           Limpar
         </b-button>
         <b-button @click="showCad = false" class="btn-list ml-4">
-          Listagem
+          {{totalRows}} registro(s)
           <i class="fa fa-arrow-right fa-lg ml-1"></i>
         </b-button>
       </div>
@@ -154,16 +115,18 @@
           <b-button @click="loadRequest(data.item, 'edit')">
             <i class="fa fa-pencil" title="Editar o registro."></i>
           </b-button>
-
           <b-button variant="danger" class="ml-1" @click="loadRequest(data.item, 'remove')">
             <i class="fa fa-trash" title="Excluir o registro."></i>
+          </b-button>
+          <b-button class="ml-1" variant="info" @click="goToStages(data.item)">
+            <i class="fa fa-flag" title="Editar etapas."></i> Etapas
           </b-button>
         </template>
       </b-table>
 
       <b-row>
         <b-col>
-          <b-button @click="showCad = true">
+          <b-button @click="refreshPage();">
             <i class="fa fa-arrow-left fa-lg mr-1"></i>Formulário
           </b-button>
         </b-col>
@@ -180,7 +143,7 @@
       </b-row>
     </div>
     <!-- FINAL DA LISTA -->
-  </draggable>
+  </div>
 </template>
 
 <script>
@@ -189,7 +152,7 @@ import axios from "axios";
 import PageTitle from "../template/PageTitle";
 import Confirm from "./Confirm";
 
-let position = 3;
+
 import draggable from "vuedraggable";
 
 export default {
@@ -201,9 +164,7 @@ export default {
       btnCancelDisabled: false,
       mode: "save",
       divisions: [],
-      request: {
-        stages: []
-      },
+      request: {},
       showCad: true,
       totalRows: 1,
       filter: null,
@@ -215,7 +176,7 @@ export default {
       items: [
         {
           key: "name",
-          label: "Descrição",
+          label: "Demanda",
           sortable: true,
           thClass: "table-th",
           tdClass: "table-td"
@@ -228,9 +189,7 @@ export default {
           thClass: "table-th",
           tdClass: "table-td"
         }
-      ],
-      list: [],
-      dragging: false
+      ]
     };
   },
   computed: {
@@ -251,18 +210,17 @@ export default {
       axios.get(url).then(res => {
         this.request = res.data;
         this.showCad = !this.showCad;
-
-        const url2 = `${baseApiUrl}/requests/${request._id}/stages`;
-        axios.get(url2).then(res2 => {
-          this.list = res2.data;
-        });
+      });
+    },
+    goToStages(request) {
+      const url = `${baseApiUrl}/requests/${request._id}`;
+      axios.get(url).then(() => {
+        this.$router.push({ name: "stageAdmin", params: { request } });
       });
     },
     save() {
       const method = this.request._id ? "patch" : "post";
       const id = this.request._id ? `/${this.request._id}` : "";
-
-      this.request.stages = this.list;
 
       this.$validator.validateAll().then(success => {
         if (!success) {
@@ -300,6 +258,7 @@ export default {
       const url = `${baseApiUrl}/requests`;
       axios.get(url).then(res => {
         this.requests = res.data;
+        this.totalRows = res.data.length;
       });
     },
     onFiltered(filteredItems) {
@@ -313,20 +272,24 @@ export default {
       if (!isCleaningForm) {
         switch (this.mode) {
           case "save":
+            this.loadRequests();
             this.$toasted.global.defaultSuccess({
-              msg: "Pedido inserido com sucesso."
+              msg: `Registro inserido com sucesso. ${this.totalRows +
+                1} registro(s) até agora.`
             });
             break;
           case "edit":
             this.$toasted.global.defaultSuccess({
-              msg: "Dados do usuário editados com sucesso."
+              msg: "Registro editado com sucesso."
             });
             doRefreshPage = false;
             break;
           case "remove":
             this.$toasted.global.defaultSuccess({
-              msg: "Pedido excluído do sistema com sucesso."
+              msg: "Registro excluído do sistema com sucesso."
             });
+            this.showCad = false;
+            doRefreshPage = false;
             break;
         }
       }
@@ -334,9 +297,12 @@ export default {
       this.loadRequests();
 
       if (doRefreshPage) {
-        let msg = "Formulário pronto para nova inserção.";
-        this.$router.push(`/admin/confirm?origin=requests&msg=${msg}`);
+        this.refreshPage();
       }
+    },
+    refreshPage() {
+      let msg = "Formulário pronto para nova inserção.";
+      this.$router.push(`/admin/confirm?origin=requests&msg=${msg}`);
     },
     submitByKey() {
       if (this.mode === "save" || this.mode === "edit") {
@@ -344,19 +310,18 @@ export default {
       } else if (this.mode === "remove") {
         this.remove();
       }
-    },
-    removeAt(idx) {
-      this.list.splice(idx, 1);
-    },
-    add: function() {
-      position++;
-      this.list.push({ name: "", position });
     }
   },
   mounted() {
+    
+    if (this.$route.params.showCad !== undefined) {
+      this.showCad = this.$route.params.showCad;
+    } 
+
     if (!this.mode) {
       this.mode = "save";
     }
+
     this.loadRequests();
     this.loadDivisions();
     this.setFocus();

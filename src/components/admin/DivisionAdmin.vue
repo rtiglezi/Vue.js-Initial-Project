@@ -13,25 +13,24 @@
           <b-row>
             <b-col md="3" sm="12" class="box-ico">
               <i class="fa fa-sitemap fa-5x" aria-hidden="true"></i>
-              <br />Dados cadastrais da
-              <br />UNIDADE
+              <br />Cadastro de Unidade
             </b-col>
             <b-col md="9" sm="12">
-              <b-form-group label="Nome *" label-for="divisionName">
+              <b-form-group label="Descrição da Unidade *" label-for="divisionName">
                 <b-form-input
                   class="input-text"
                   ref="divisionName"
-                  name="Nome"
+                  name="Descrição"
                   id="divisionName"
                   v-model="division.name"
                   :readonly="mode === 'remove'"
                   v-validate="{ required: true, min: 3 }"
                 ></b-form-input>
                 <span
-                  ref="spnNome"
-                  v-if="showSpanError('Nome')"
+                  ref="spnDescrição"
+                  v-if="showSpanError('Descrição')"
                   class="adm-msg-error"
-                >{{ errors.first('Nome') }}</span>
+                >{{ errors.first('Descrição') }}</span>
               </b-form-group>
             </b-col>
           </b-row>
@@ -55,8 +54,8 @@
           <i class="fa fa-eraser fa-lg"></i>
           Limpar
         </b-button>
-        <b-button @click="showCad = false" class="ml-4">
-          Listagem
+        <b-button @click="showCad = false" class="btn-list ml-4">
+          {{totalRows}} registro(s)
           <i class="fa fa-arrow-right fa-lg ml-1"></i>
         </b-button>
       </div>
@@ -114,7 +113,7 @@
 
       <b-row>
         <b-col>
-          <b-button @click="showCad = true">
+          <b-button @click="refreshPage();">
             <i class="fa fa-arrow-left fa-lg mr-1"></i>Formulário
           </b-button>
         </b-col>
@@ -167,7 +166,7 @@ export default {
         },
         {
           key: "name",
-          label: "Nome",
+          label: "Unidade",
           sortable: true,
           thClass: "table-th",
           tdClass: "table-td"
@@ -188,6 +187,7 @@ export default {
       const url = `${baseApiUrl}/divisions`;
       axios.get(url).then(res => {
         this.divisions = res.data;
+        this.totalRows = res.data.length;
       });
     },
     loadDivision(division, mode) {
@@ -245,20 +245,24 @@ export default {
       if (!isCleaningForm) {
         switch (this.mode) {
           case "save":
+            this.loadDivisions();
             this.$toasted.global.defaultSuccess({
-              msg: "Unidade inserida com sucesso."
+              msg: `Registro inserido com sucesso. ${this.totalRows +
+                1} registro(s) até agora.`
             });
+
             break;
           case "edit":
             this.$toasted.global.defaultSuccess({
-              msg: "Dados da Unidade editados com sucesso."
+              msg: "Registro editado com sucesso."
             });
-            doRefreshPage = false;
             break;
           case "remove":
             this.$toasted.global.defaultSuccess({
-              msg: "Unidade excluída do sistema com sucesso."
+              msg: "Registro excluído do sistema com sucesso."
             });
+            this.showCad = false;
+            doRefreshPage = false;
             break;
         }
       }
@@ -266,9 +270,12 @@ export default {
       this.loadDivisions();
 
       if (doRefreshPage) {
-        let msg = "Formulário pronto para nova inserção.";
-        this.$router.push(`/admin/confirm?origin=divisions&msg=${msg}`);
+        this.refreshPage();
       }
+    },
+    refreshPage() {
+      let msg = "Formulário pronto para nova inserção.";
+      this.$router.push(`/admin/confirm?origin=divisions&msg=${msg}`);
     },
     submitByKey() {
       if (this.mode === "save" || this.mode === "edit") {

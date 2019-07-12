@@ -21,7 +21,7 @@
               <i class="fa fa-sitemap mr-1 admin-icon"></i>Unidades
             </b-dropdown-item>
             <b-dropdown-item href="#" @click="navigate('/admin/requests')">
-              <i class="fa fa-paperclip mr-1 admin-icon"></i>Pedidos
+              <i class="fa fa-paperclip mr-1 admin-icon"></i>Demandas
             </b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>

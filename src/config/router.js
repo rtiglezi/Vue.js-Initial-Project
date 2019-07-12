@@ -5,12 +5,11 @@ import Home from "@/components/home/Home";
 import UserAdmin from "@/components/admin/UserAdmin";
 import DivisionAdmin from "@/components/admin/DivisionAdmin";
 import RequestAdmin from "@/components/admin/RequestAdmin";
-
+import StageAdmin from "@/components/admin/StageAdmin";
 
 import Confirm from "@/components/admin/Confirm";
 import Auth from "@/components/auth/Auth";
 import Profile from "@/components/admin/Profile";
-
 
 Vue.use(VueRouter);
 
@@ -21,7 +20,7 @@ const routes = [
     component: Home
   },
   { name: "auth", path: "/auth/:email?", component: Auth },
-   { name: "profile", path: "/admin/users/profile", component: Profile },
+  { name: "profile", path: "/admin/users/profile", component: Profile },
   {
     name: "userAdmin",
     path: "/admin/users",
@@ -38,6 +37,12 @@ const routes = [
     name: "requestAdmin",
     path: "/admin/requests",
     component: RequestAdmin,
+    meta: { requiresAdmin: true }
+  },
+  {
+    name: "stageAdmin",
+    path: "/admin/stages",
+    component: StageAdmin,
     meta: { requiresAdmin: true }
   },
   {
