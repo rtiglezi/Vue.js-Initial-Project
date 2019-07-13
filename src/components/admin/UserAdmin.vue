@@ -194,7 +194,7 @@
       <b-row>
         <b-col>
           <b-button @click="refreshPage();">
-            <i class="fa fa-arrow-left fa-lg mr-1"></i>Formulário
+            <i class="fa fa-arrow-left fa-lg mr-1"></i>Novo Cadastro
           </b-button>
         </b-col>
         <b-col>

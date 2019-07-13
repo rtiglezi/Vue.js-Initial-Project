@@ -118,8 +118,9 @@
           <b-button variant="danger" class="ml-1" @click="loadRequest(data.item, 'remove')">
             <i class="fa fa-trash" title="Excluir o registro."></i>
           </b-button>
-          <b-button class="ml-1" variant="info" @click="goToStages(data.item)">
-            <i class="fa fa-flag" title="Editar etapas."></i> Etapas
+          <b-button style="width: 115px" class="ml-1" variant="info" @click="goToStages(data.item)">
+            <i class="fa fa-flag" title="Editar etapas."></i> {{data.item.stages.length}} 
+            etapa<span v-if="data.item.stages.length > 1">s</span>
           </b-button>
         </template>
       </b-table>
@@ -127,7 +128,7 @@
       <b-row>
         <b-col>
           <b-button @click="refreshPage();">
-            <i class="fa fa-arrow-left fa-lg mr-1"></i>Formulário
+            <i class="fa fa-arrow-left fa-lg mr-1"></i>Novo Cadastro
           </b-button>
         </b-col>
         <b-col>

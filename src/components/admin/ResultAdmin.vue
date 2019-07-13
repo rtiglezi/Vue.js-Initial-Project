@@ -2,67 +2,70 @@
   <div class="result-admin">
     <!-- INICIO FORMULÁRIO DE CADASTRO -->
     <b-form v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
-      <b-card style="background-color: #ddd">
-        <b-row>
-          <b-col>
-            <draggable class="row">
-              <input type="hidden" v-model="request.stages" />
+      <b-row>
+        <b-col>
+          <draggable class="row">
+            <input type="hidden" v-model="request.stages" />
 
-              <draggable class="col-12">
-                <draggable tag="ul" :list="list" class="list-group" handle=".handle">
-                  Resultados:
-                  <li
-                    class="list-group-item mb-1"
-                    v-for="(element, idx) in list"
-                    :key="element.position"
-                  >
-                    <b-row>
-                      <b-col md="1">
-                        <i
-                          class="fa fa-arrows handle mr-3"
-                          style="cursor: pointer"
-                          title="Arrastar..."
-                        ></i>
-                      </b-col>
-                      <b-col md="9">
-                        <input
-                          type="text"
-                          class="form-control"
-                          v-model="element.name"
-                          style="width:100%"
-                          size="sm"
-                        />
-                      </b-col>
-                      <b-col md="2">
-                        <i
-                          class="fa fa-times close ml-3"
-                          style="color:red"
-                          title="Excluir..."
-                          @click="removeAt(idx)"
-                        ></i>
-                      </b-col>
-                    </b-row>
-                  </li>
-
+            <draggable class="col-12">
+              <draggable tag="ul" :list="list" class="list-group" handle=".handle">
+                <li
+                  class="list-group-item mb-1"
+                  v-for="(element, idx) in list"
+                  :key="element.position"
+                  style="background-color: #eee"
+                >
                   <b-row>
-                    <b-col md="4">
-                      <b-button
-                        variant="secondary"
-                        size="sm"
+                    <b-col md="1">
+                      <i
+                        class="fa fa-arrows handle mr-3"
+                        style="cursor: pointer"
+                        title="Arrastar..."
+                      ></i>
+                    </b-col>
+                    <b-col md="5">
+                      <input
+                        type="text"
+                        class="form-control"
+                        v-model="element.name"
                         style="width:100%"
+                        size="sm"
+                      />
+                    </b-col>
+                    <b-col md="5">
+                      <b-form-checkbox
+                        :id="'checkbox-'+idx"
+                        v-model="element.entailsConclusion"
+                        :name="'checkbox-'+idx"
+                        value="true"
+                        unchecked-value="false"
                         class="mt-1"
-                        @click="add"
-                      >
-                        <i class="fa fa-plus mr-1"></i>Adicionar Resultado
-                      </b-button>
+                        style="color: grey"
+                      >Gera a conclusão do processo na(s) unidade(s)</b-form-checkbox>
+                    </b-col>
+                    <b-col md="1">
+                      <i
+                        class="fa fa-times close ml-3"
+                        style="color:red"
+                        title="Excluir..."
+                        @click="removeAt(idx)"
+                      ></i>
                     </b-col>
                   </b-row>
-                </draggable>
+                </li>
+
+                <b-row>
+                  <b-col md="4">
+                    <b-badge href="#" variant="link" class="mt-1" @click="add">
+                      <i class="fa fa-plus mr-1"></i>Adicionar Resultado
+                    </b-badge>
+                  </b-col>
+                </b-row>
               </draggable>
             </draggable>
-          </b-col>
-        </b-row>
-      </b-card>
+          </draggable>
+        </b-col>
+      </b-row>
     </b-form>
     <!-- FINAL FORMULÁRIO DE CADASTRO -->
   </div>

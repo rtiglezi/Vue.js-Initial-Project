@@ -12,9 +12,9 @@
           <b-row>
             <b-col md="3" sm="12" class="box-ico">
               <i class="fa fa-flag fa-5x" aria-hidden="true"></i>
-              <br />Etapas da Demanda
-              
-              <div class="descRequest">{{ request.name }}</div>
+              <br />A Demanda
+              <div class="descRequest">{{ request.name }}</div>tem
+              <span style="font-size:1.3em; font-weight:bold">{{list.length}}</span> etapa(s) adicionada(s)
             </b-col>
             <b-col md="9" sm="12">
               <draggable class="row">
@@ -35,27 +35,72 @@
                             title="Arrastar..."
                           ></i>
                         </b-col>
-                        <b-col md="9">
-                          Etapa:
+                        <b-col md="10">
                           <input
                             type="text"
                             class="form-control"
                             v-model="element.name"
-                            style="width:100%;"
+                            style="width:100%"
                           />
                         </b-col>
-                        <b-col md="2">
+                        <b-col md="1">
                           <i
                             class="fa fa-times close ml-3"
                             style="color:red"
                             title="Excluir..."
                             @click="removeAt(idx)"
                           ></i>
-
                         </b-col>
                       </b-row>
-                      <hr/>
-                      <ResultAdmin :stage="element"></ResultAdmin>
+
+                      <hr />
+
+                      <div>
+                        <b-button
+                          variant="link"
+                          v-b-toggle="'division_'+idx+1"
+                          size="sm"
+                          class="pl-2 pr-2 pt-0 pb-0"
+                        >
+                          <b-badge
+                            variant="primary"
+                            class="mr-1"
+                          >{{element.allowedDivisions ? element.allowedDivisions.length : "" }}</b-badge>Unidade(s) responsável(veis)
+                        </b-button>
+                        <b-collapse :id="'division_'+idx+1" class="mt-2 ml-5">
+                          <b-form-checkbox-group
+                            stacked
+                            id="user-allowedDivisions"
+                            v-model="element.allowedDivisions"
+                            name="divisions"
+                          >
+                            <b-form-checkbox
+                              v-for="division in divisions"
+                              :key="division._id"
+                              :value="division._id"
+                            >{{ division.name }}</b-form-checkbox>
+                          </b-form-checkbox-group>
+                        </b-collapse>
+                      </div>
+
+                      <hr />
+
+                      <div>
+                        <b-button
+                          variant="link"
+                          v-b-toggle="'result_'+idx+1"
+                          size="sm"
+                          class="pl-2 pr-2 pt-0 pb-0"
+                        >
+                          <b-badge
+                            variant="primary"
+                            class="mr-1"
+                          >{{element.results ? element.results.length : "" }}</b-badge>Resultado(s)
+                        </b-button>
+                        <b-collapse :id="'result_'+idx+1" class="mt-2">
+                          <ResultAdmin :stage="element"></ResultAdmin>
+                        </b-collapse>
+                      </div>
                     </li>
 
                     <br />
@@ -110,6 +155,7 @@ export default {
   name: "StageAdmin",
   components: { PageTitle, Confirm, draggable, ResultAdmin },
   display: "Handle",
+  divisions: [],
   data: function() {
     return {
       request: {},
@@ -123,6 +169,12 @@ export default {
     }
   },
   methods: {
+    loadDivisions() {
+      const url = `${baseApiUrl}/divisions`;
+      axios.get(url).then(res => {
+        this.divisions = res.data;
+      });
+    },
     loadRequest(request) {
       const url = `${baseApiUrl}/requests/${request._id}`;
       axios.get(url).then(res => {
@@ -139,7 +191,9 @@ export default {
         this.list
       )
         .then(() => {
-          alert("Alterações salvas com sucesso!");
+          this.$toasted.global.defaultSuccess({
+            msg: `Alterações registradas com sucesso!`
+          });
         })
         .catch();
     },
@@ -148,15 +202,23 @@ export default {
     },
     removeAt(idx) {
       this.list.splice(idx, 1);
+      this.loadDivisions();
     },
     add: function() {
       position++;
-      this.list.push({ name: "Nova etapa...", position });
+      this.list.push({
+        name: "Nova etapa...",
+        results: [],
+        allowedDivisions: [],
+        position
+      });
+      this.loadDivisions();
     }
   },
   mounted() {
     this.request = this.$route.params.request;
     this.loadRequest(this.request);
+    this.loadDivisions();
   }
 };
 </script>
