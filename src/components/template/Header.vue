@@ -4,7 +4,7 @@
       <b-navbar-brand href="#" class="header-title" @click="navigate('/')">
         <img src="@/assets/c-proc.png" alt="Logo" width="30" />ceproc
       </b-navbar-brand>
-
+      <span class="mr-3 client">MCTIC - SP</span>
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
@@ -91,5 +91,9 @@ export default {
 }
 .header .admin-icon {
   color: #C8A741;
+}
+.header .client {
+  color: #F2E15D;
+  font-weight: bold;
 }
 </style>

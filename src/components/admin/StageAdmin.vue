@@ -9,6 +9,15 @@
     <b-form v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
       <b-card class="mb-2 box-out">
         <b-card class="box">
+          <div class="text-right">
+            <a href="#" v-on:click.prevent="expandAll">
+              <i class="fa fa-plus-square mr-1"></i>Expandir todos
+            </a>
+            |
+            <a href="#" v-on:click.prevent="collapseAll">
+              <i class="fa fa-minus-square mr-1"></i>Fechar todos
+            </a>
+          </div>
           <b-row>
             <b-col md="3" sm="12" class="box-ico">
               <i class="fa fa-flag fa-5x" aria-hidden="true"></i>
@@ -58,7 +67,7 @@
                       <div>
                         <b-button
                           variant="link"
-                          v-b-toggle="'division_'+idx+1"
+                          v-b-toggle="'division_' + element._id"
                           size="sm"
                           class="pl-2 pr-2 pt-0 pb-0"
                         >
@@ -67,7 +76,7 @@
                             class="mr-1"
                           >{{element.allowedDivisions ? element.allowedDivisions.length : "" }}</b-badge>Unidade(s) responsável(veis)
                         </b-button>
-                        <b-collapse :id="'division_'+idx+1" class="mt-2 ml-5">
+                        <b-collapse ref="collapsible" :id="'division_' + element._id" class="mt-2 ml-5">
                           <b-form-checkbox-group
                             stacked
                             id="user-allowedDivisions"
@@ -88,7 +97,7 @@
                       <div>
                         <b-button
                           variant="link"
-                          v-b-toggle="'result_'+idx+1"
+                          v-b-toggle="'result_' + element._id"
                           size="sm"
                           class="pl-2 pr-2 pt-0 pb-0"
                         >
@@ -97,7 +106,7 @@
                             class="mr-1"
                           >{{element.results ? element.results.length : "" }}</b-badge>Resultado(s)
                         </b-button>
-                        <b-collapse :id="'result_'+idx+1" class="mt-2">
+                        <b-collapse ref="collapsible" :id="'result_' + element._id" class="mt-2">
                           <ResultAdmin :stage="element"></ResultAdmin>
                         </b-collapse>
                       </div>
@@ -153,7 +162,12 @@ import draggable from "vuedraggable";
 
 export default {
   name: "StageAdmin",
-  components: { PageTitle, Confirm, draggable, ResultAdmin },
+  components: {
+    PageTitle,
+    Confirm,
+    draggable,
+    ResultAdmin
+  },
   display: "Handle",
   divisions: [],
   data: function() {
@@ -213,6 +227,16 @@ export default {
         position
       });
       this.loadDivisions();
+    },
+    collapseAll() {
+      this.$refs.collapsible.map(c => {
+        c.visible = false;
+      });
+    },
+    expandAll() {
+      this.$refs.collapsible.map(c => {
+        c.visible = true;
+      });
     }
   },
   mounted() {
