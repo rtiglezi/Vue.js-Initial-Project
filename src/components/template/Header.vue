@@ -4,10 +4,22 @@
       <b-navbar-brand href="#" class="header-title" @click="navigate('/')">
         <img src="@/assets/c-proc.png" alt="Logo" width="30" />ceproc
       </b-navbar-brand>
-      <span class="mr-3 client">MCTIC - SP</span>
+      <span class="mr-3 client">{{ user.tenant_alias }}</span>
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
+        <b-navbar-nav v-if="user.profiles.indexOf('creator')!=-1">
+          <b-nav-item-dropdown text="Configuração">
+            <template slot="button-content">
+              <i class="fa fa-registered"></i>
+              Criação
+            </template>
+            <b-dropdown-item href="#" @click="navigate('/admin/tenants')">
+              <i class="fa fa-building mr-1 admin-icon"></i>Inquilinos
+            </b-dropdown-item>
+          </b-nav-item-dropdown>
+        </b-navbar-nav>
+
         <b-navbar-nav v-if="user.profiles.indexOf('admin')!=-1">
           <b-nav-item-dropdown text="Administração">
             <template slot="button-content">
@@ -90,10 +102,10 @@ export default {
   font-weight: bold;
 }
 .header .admin-icon {
-  color: #C8A741;
+  color: #c8a741;
 }
 .header .client {
-  color: #F2E15D;
+  color: #f2e15d;
   font-weight: bold;
 }
 </style>

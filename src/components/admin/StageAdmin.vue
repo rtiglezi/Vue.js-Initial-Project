@@ -76,7 +76,11 @@
                             class="mr-1"
                           >{{element.allowedDivisions ? element.allowedDivisions.length : "" }}</b-badge>Unidade(s) responsável(veis)
                         </b-button>
-                        <b-collapse ref="collapsible" :id="'division_' + element._id" class="mt-2 ml-5">
+                        <b-collapse
+                          ref="collapsible"
+                          :id="'division_' + element._id"
+                          class="mt-2 ml-5"
+                        >
                           <b-form-checkbox-group
                             stacked
                             id="user-allowedDivisions"
