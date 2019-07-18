@@ -11,11 +11,11 @@
         <b-card class="box">
           <div class="text-right">
             <a href="#" v-on:click.prevent="expandAll">
-              <i class="fa fa-plus-square mr-1"></i>Expandir todos
+              <i class="fa fa-plus-square mr-1"></i>Expandir
             </a>
             |
             <a href="#" v-on:click.prevent="collapseAll">
-              <i class="fa fa-minus-square mr-1"></i>Fechar todos
+              <i class="fa fa-minus-square mr-1"></i>Esconder
             </a>
           </div>
           <b-row>
@@ -54,7 +54,7 @@
                         </b-col>
                         <b-col md="1">
                           <i
-                            class="fa fa-times close ml-3"
+                            class="fas fa-trash-alt close ml-3"
                             style="color:red"
                             title="Excluir..."
                             @click="removeAt(idx)"

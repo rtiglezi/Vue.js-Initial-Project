@@ -45,7 +45,7 @@
                     </b-col>
                     <b-col md="1">
                       <i
-                        class="fa fa-times close ml-3"
+                        class="fas fa-trash-alt close ml-3"
                         style="color:red"
                         title="Excluir..."
                         @click="removeAt(idx)"

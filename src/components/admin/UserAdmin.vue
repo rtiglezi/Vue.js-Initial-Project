@@ -443,7 +443,7 @@ export default {
       this.loadTenants();
       this.loadResources();
       this.setFocus();
-      this.profiles = [{ name: "admin" }, { name: "master" }];
+      this.profiles = [{ name: "admin" }];
       this.user = {
         profiles: ["user"]
       }
