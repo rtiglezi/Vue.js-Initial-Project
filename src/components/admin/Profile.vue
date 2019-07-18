@@ -1,6 +1,6 @@
 <template>
   <div class="profile">
-    <PageTitle icon="fa fa-users" main="Perfil" sub="Área administrativa de acesso restrito" />
+    <PageTitle icon="fas fa-user-circle" main="Perfil" sub="Área administrativa de acesso restrito" />
 
     <b-row>
       <b-col>

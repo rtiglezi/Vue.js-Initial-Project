@@ -8,10 +8,10 @@
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
-        <b-navbar-nav v-if="user.profiles.indexOf('creator')!=-1">
+        <b-navbar-nav v-if="user.profiles.indexOf('master')!=-1">
           <b-nav-item-dropdown text="Configuração">
             <template slot="button-content">
-              <i class="fa fa-registered"></i>
+              <i class="fas fa-meteor"></i>
               Criação
             </template>
             <b-dropdown-item href="#" @click="navigate('/admin/tenants')">
@@ -33,7 +33,7 @@
               <i class="fa fa-sitemap mr-1 admin-icon"></i>Unidades
             </b-dropdown-item>
             <b-dropdown-item href="#" @click="navigate('/admin/requests')">
-              <i class="fa fa-paperclip mr-1 admin-icon"></i>Demandas
+              <i class="fas fa-tags mr-1 admin-icon"></i>Demandas
             </b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>
@@ -57,7 +57,7 @@
               <i class="fa fa-user-circle admin-icon"></i> Perfil
             </b-dropdown-item>
             <b-dropdown-item href="#" @click="logout()">
-              <i class="fa fa-sign-out admin-icon"></i> Sair
+              <i class="fas fa-sign-out-alt admin-icon"></i> Sair
             </b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>

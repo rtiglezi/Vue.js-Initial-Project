@@ -6,66 +6,67 @@
       sub="Área administrativa de acesso restrito"
     />
 
-    <!-- INICIO FORMULÁRIO DE CADASTRO -->
-    <b-form v-if="showCad" v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
-      <b-card class="mb-3 box-out">
-        <b-card class="box">
-          <b-row>
-            <b-col md="3" sm="12" class="box-ico">
-              <i class="fa fa-sitemap fa-5x" aria-hidden="true"></i>
-              <br />Cadastro de Unidade
-            </b-col>
-            <b-col md="9" sm="12">
-              <b-form-group label="Descrição da Unidade *" label-for="divisionName">
-                <b-form-input
-                  class="input-text"
-                  ref="divisionName"
-                  name="Descrição"
-                  id="divisionName"
-                  v-model="division.name"
-                  :readonly="mode === 'remove'"
-                  v-validate="{ required: true, min: 3 }"
-                ></b-form-input>
-                <span
-                  ref="spnDescrição"
-                  v-if="showSpanError('Descrição')"
-                  class="adm-msg-error"
-                >{{ errors.first('Descrição') }}</span>
-              </b-form-group>
-            </b-col>
-          </b-row>
-        </b-card>
-      </b-card>
+    <b-modal
+      size="lg"
+      v-bind:hide-footer="true"
+      id="mymodal"
+      v-model="modalShow"
+      title="Cadastro de Unidade"
+    >
+      <!-- INICIO FORMULÁRIO DE CADASTRO -->
+      <b-form v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
+        <b-card class="mb-3 box-out">
+          <b-card class="box">
+            <b-row>
+              <b-col md="3" sm="12" class="box-ico">
+                <i class="fa fa-sitemap fa-5x" aria-hidden="true"></i>
+                <br />Cadastro de Unidade
+              </b-col>
+              <b-col md="9" sm="12">
+                <b-form-group label="Nome da Unidade *" label-for="divisionName">
+                  <b-form-input
+                    class="input-text"
+                    ref="divisionName"
+                    name="Nome"
+                    id="divisionName"
+                    v-model="division.name"
+                    :readonly="mode === 'remove'"
+                    v-validate="{ required: true, min: 3 }"
+                  ></b-form-input>
+                  <span
+                    ref="spnNome"
+                    v-if="showSpanError('Nome')"
+                    class="adm-msg-error"
+                  >{{ errors.first('Nome') }}</span>
+                </b-form-group>
 
-      <div class="text-right">
-        <b-button class="btn-main ml-2" v-if="mode === 'save'" @click="save">
-          <i class="fa fa-send fa-lg"></i>
-          Inserir
-        </b-button>
-        <b-button class="btn-main ml-2" v-if="mode === 'edit'" @click="save">
-          <i class="fa fa-pencil fa-lg"></i>
-          Editar
-        </b-button>
-        <b-button variant="danger" class="ml-2" v-if="mode === 'remove'" @click="remove">
-          <i class="fa fa-trash fa-lg"></i>
-          Excluir?
-        </b-button>
-        <b-button @click="refresh(true)" class="ml-2">
-          <i class="fa fa-eraser fa-lg"></i>
-          Limpar
-        </b-button>
-        <b-button @click="showCad = false" class="btn-list ml-4">
-          {{totalRows}} registro(s)
-          <i class="fa fa-arrow-right fa-lg ml-1"></i>
-        </b-button>
-      </div>
-    </b-form>
-    <!-- FINAL FORMULÁRIO DE CADASTRO -->
+              </b-col>
+            </b-row>
+          </b-card>
+        </b-card>
+
+        <div class="text-right">
+          <b-button class="btn-main ml-2" v-if="mode === 'save'" @click="save">
+            <i class="fa fa-send fa-lg"></i>
+            Inserir
+          </b-button>
+          <b-button class="btn-main ml-2" v-if="mode === 'edit'" @click="save">
+            <i class="fas fa-save fa-lg"></i>
+            Salvar Edição
+          </b-button>
+          <b-button variant="danger" class="ml-2" v-if="mode === 'remove'" @click="remove">
+            <i class="far fa-trash-alt fa-lg"></i>
+            Excluir?
+          </b-button>
+          <b-button class="ml-2" variant="secondary" @click="clickModalBtn()">Cancelar</b-button>
+        </div>
+      </b-form>
+      <!-- FINAL FORMULÁRIO DE CADASTRO -->
+    </b-modal>
 
     <!-- INÍCIO DA LISTA -->
-    <div v-if="!showCad">
+    <div>
       <b-row class="mb-2">
-        <b-col></b-col>
         <b-col>
           <b-input-group>
             <b-form-input small ref="txtFilter" v-model="filter" placeholder="Busca rápida ..."></b-form-input>
@@ -101,34 +102,40 @@
         </template>
 
         <template slot="actions" slot-scope="data">
-          <b-button @click="loadDivision(data.item, 'edit')">
-            <i class="fa fa-pencil" title="Editar o registro."></i>
+          <b-button v-b-modal="'mymodal'" @click="loadResource(data.item, 'edit')">
+            <i class="fas fa-pen-square" title="Editar o registro."></i>
           </b-button>
 
-          <b-button variant="danger" class="ml-1" @click="loadDivision(data.item, 'remove')">
-            <i class="fa fa-trash" title="Excluir o registro."></i>
+          <b-button
+            v-b-modal="'mymodal'"
+            variant="danger"
+            class="ml-1"
+            @click="loadResource(data.item, 'remove')"
+          >
+            <i class="far fa-trash-alt" title="Excluir o registro."></i>
           </b-button>
         </template>
       </b-table>
-
-      <b-row>
-        <b-col>
-          <b-button @click="refreshPage();">
-            <i class="fa fa-arrow-left fa-lg mr-1"></i>Novo Cadastro
-          </b-button>
-        </b-col>
-        <b-col>
-          <b-pagination
-            small
-            align="right"
-            v-model="currentPage"
-            :total-rows="totalRows"
-            :per-page="perPage"
-            aria-controls="my-table"
-          ></b-pagination>
-        </b-col>
-      </b-row>
     </div>
+
+    <b-row>
+      <b-col>
+        <b-button v-b-modal="'mymodal'" @click="clearForm">
+          <i class="fas fa-plus"></i> Adicionar
+        </b-button>
+      </b-col>
+      <b-col>
+        <b-pagination
+          small
+          align="right"
+          v-model="currentPage"
+          :total-rows="totalRows"
+          :per-page="perPage"
+          aria-controls="my-table"
+        ></b-pagination>
+      </b-col>
+    </b-row>
+
     <!-- FINAL DA LISTA -->
   </div>
 </template>
@@ -144,18 +151,16 @@ export default {
   components: { PageTitle, Confirm },
   data: function() {
     return {
-      btnCancelDisabled: false,
+      modalShow: false,
       mode: "save",
       divisions: [],
       division: {},
-      showCad: true,
       totalRows: 1,
       filter: null,
       currentPage: 1,
       perPage: 7,
       pageOptions: [5, 10, 15],
       options: [],
-
       items: [
         {
           key: "created_at",
@@ -166,7 +171,14 @@ export default {
         },
         {
           key: "name",
-          label: "Unidade",
+          label: "Nome",
+          sortable: true,
+          thClass: "table-th",
+          tdClass: "table-td"
+        },
+        {
+          key: "name",
+          label: "Nome",
           sortable: true,
           thClass: "table-th",
           tdClass: "table-td"
@@ -183,25 +195,26 @@ export default {
     };
   },
   methods: {
-    loadDivisions() {
+    clickModalBtn() {
+      this.modalShow = false;
+    },
+    loadResources() {
       const url = `${baseApiUrl}/divisions`;
       axios.get(url).then(res => {
         this.divisions = res.data;
         this.totalRows = res.data.length;
       });
     },
-    loadDivision(division, mode) {
+    loadResource(division, mode) {
       this.mode = mode;
       const url = `${baseApiUrl}/divisions/${division._id}`;
       axios.get(url).then(res => {
         this.division = res.data;
-        this.showCad = !this.showCad;
       });
     },
     save() {
       const method = this.division._id ? "patch" : "post";
       const id = this.division._id ? `/${this.division._id}` : "";
-
       this.$validator.validateAll().then(success => {
         if (!success) {
           return;
@@ -222,9 +235,6 @@ export default {
         })
         .catch(showError);
     },
-    setFocus() {
-      this.$refs.divisionName.$el.focus();
-    },
     showSpanError(campo) {
       let obj = this.errors.items;
       let index = obj.findIndex(val => val.field == campo);
@@ -239,43 +249,32 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    refresh(isCleaningForm) {
-      let doRefreshPage = true;
-
-      if (!isCleaningForm) {
-        switch (this.mode) {
-          case "save":
-            this.loadDivisions();
-            this.$toasted.global.defaultSuccess({
-              msg: `Registro inserido com sucesso. ${this.totalRows +
-                1} registro(s) até agora.`
-            });
-
-            break;
-          case "edit":
-            this.$toasted.global.defaultSuccess({
-              msg: "Registro editado com sucesso."
-            });
-            break;
-          case "remove":
-            this.$toasted.global.defaultSuccess({
-              msg: "Registro excluído do sistema com sucesso."
-            });
-            this.showCad = false;
-            doRefreshPage = false;
-            break;
-        }
-      }
-
-      this.loadDivisions();
-
-      if (doRefreshPage) {
-        this.refreshPage();
-      }
+    refresh() {
+      switch (this.mode) {
+        case "save":
+          this.$toasted.global.defaultSuccess({
+            msg: `Registro inserido com sucesso. ${this.totalRows +
+              1} registro(s) até agora.`
+          });
+          break;
+        case "edit":
+          this.$toasted.global.defaultSuccess({
+            msg: "Registro editado com sucesso."
+          });
+          break;
+        case "remove":
+          this.$toasted.global.defaultSuccess({
+            msg: "Registro excluído do sistema com sucesso."
+          });
+          break;
+       }
+      this.clearForm();
     },
-    refreshPage() {
-      let msg = "Formulário pronto para nova inserção.";
-      this.$router.push(`/admin/confirm?origin=divisions&msg=${msg}`);
+    clearForm() {
+      this.clickModalBtn();
+      this.loadResources();
+      this.division = {};
+      this.mode = "save";
     },
     submitByKey() {
       if (this.mode === "save" || this.mode === "edit") {
@@ -289,8 +288,7 @@ export default {
     if (!this.mode) {
       this.mode = "save";
     }
-    this.loadDivisions();
-    this.setFocus();
+    this.loadResources();
   }
 };
 </script>

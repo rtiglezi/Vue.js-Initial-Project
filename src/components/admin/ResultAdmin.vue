@@ -18,7 +18,7 @@
                   <b-row>
                     <b-col md="1">
                       <i
-                        class="fa fa-arrows handle mr-3"
+                        class="fas fa-arrows-alt handle mr-3"
                         style="cursor: pointer"
                         title="Arrastar..."
                       ></i>

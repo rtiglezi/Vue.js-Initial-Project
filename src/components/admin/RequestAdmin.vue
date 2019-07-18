@@ -1,72 +1,71 @@
 <template>
   <div class="request-admin">
     <PageTitle
-      icon="fa fa-paperclip"
+      icon="fa fa-tags"
       main="Cadastro de Demandas"
       sub="Área administrativa de acesso restrito"
     />
 
-    <!-- INICIO FORMULÁRIO DE CADASTRO -->
-    <b-form v-if="showCad" v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
-      <b-card class="mb-2 box-out">
-        <b-card class="box">
-          <b-row>
-            <b-col md="3" sm="12" class="box-ico">
-              <i class="fa fa-paperclip fa-5x" aria-hidden="true"></i>
-              <br />Cadastro de Demanda
-            </b-col>
-            <b-col md="9" sm="12">
-              <b-form-group label="Descrição da Demanda *" label-for="requestName">
-                <b-form-input
-                  ref="requestName"
-                  name="Descrição"
-                  id="requestName"
-                  class="input-text"
-                  v-model="request.name"
-                  :readonly="mode === 'remove'"
-                  v-validate="{ required: true, min: 3 }"
-                  style="width: 100%"
-                ></b-form-input>
-                <span
-                  ref="spnDescrição"
-                  v-if="showSpanError('Descrição')"
-                  class="adm-msg-error"
-                >{{ errors.first('Descrição') }}</span>
-              </b-form-group>
-            </b-col>
-          </b-row>
+    <b-modal
+      size="lg"
+      v-bind:hide-footer="true"
+      id="mymodal"
+      v-model="modalShow"
+      title="Cadastro de Demanda"
+    >
+      <!-- INICIO FORMULÁRIO DE CADASTRO -->
+      <b-form v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
+        <b-card class="mb-3 box-out">
+          <b-card class="box">
+            <b-row>
+              <b-col md="3" sm="12" class="box-ico">
+                <i class="fa fa-tags fa-5x" aria-hidden="true"></i>
+                <br />Cadastro de Demanda
+              </b-col>
+              <b-col md="9" sm="12">
+                <b-form-group label="Nome da Demanda *" label-for="requestName">
+                  <b-form-input
+                    class="input-text"
+                    ref="requestName"
+                    name="Nome"
+                    id="requestName"
+                    v-model="request.name"
+                    :readonly="mode === 'remove'"
+                    v-validate="{ required: true, min: 3 }"
+                  ></b-form-input>
+                  <span
+                    ref="spnNome"
+                    v-if="showSpanError('Nome')"
+                    class="adm-msg-error"
+                  >{{ errors.first('Nome') }}</span>
+                </b-form-group>
+              </b-col>
+            </b-row>
+          </b-card>
         </b-card>
-      </b-card>
 
-      <div class="text-right">
-        <b-button class="btn-main ml-2" v-if="mode === 'save'" @click="save">
-          <i class="fa fa-send fa-lg"></i>
-          Inserir
-        </b-button>
-        <b-button class="btn-main ml-2" v-if="mode === 'edit'" @click="save">
-          <i class="fa fa-pencil fa-lg"></i>
-          Editar
-        </b-button>
-        <b-button variant="danger" class="ml-2" v-if="mode === 'remove'" @click="remove">
-          <i class="fa fa-trash fa-lg"></i>
-          Excluir?
-        </b-button>
-        <b-button @click="refresh(true)" class="btn-clean ml-2">
-          <i class="fa fa-eraser fa-lg"></i>
-          Limpar
-        </b-button>
-        <b-button @click="showCad = false" class="btn-list ml-4">
-          {{totalRows}} registro(s)
-          <i class="fa fa-arrow-right fa-lg ml-1"></i>
-        </b-button>
-      </div>
-    </b-form>
-    <!-- FINAL FORMULÁRIO DE CADASTRO -->
+        <div class="text-right">
+          <b-button class="btn-main ml-2" v-if="mode === 'save'" @click="save">
+            <i class="fa fa-send fa-lg"></i>
+            Inserir
+          </b-button>
+          <b-button class="btn-main ml-2" v-if="mode === 'edit'" @click="save">
+            <i class="fas fa-save fa-lg"></i>
+            Salvar Edição
+          </b-button>
+          <b-button variant="danger" class="ml-2" v-if="mode === 'remove'" @click="remove">
+            <i class="far fa-trash-alt fa-lg"></i>
+            Excluir?
+          </b-button>
+          <b-button class="ml-2" variant="secondary" @click="clickModalBtn()">Cancelar</b-button>
+        </div>
+      </b-form>
+      <!-- FINAL FORMULÁRIO DE CADASTRO -->
+    </b-modal>
 
     <!-- INÍCIO DA LISTA -->
-    <div v-if="!showCad">
+    <div>
       <b-row class="mb-2">
-        <b-col></b-col>
         <b-col>
           <b-input-group>
             <b-form-input small ref="txtFilter" v-model="filter" placeholder="Busca rápida ..."></b-form-input>
@@ -84,9 +83,9 @@
         :items="requests"
         :per-page="perPage"
         :current-page="currentPage"
-        bordered
-        responsive
         small
+        responsive
+        bordered
         :filter="filter"
         :fields="items"
         @filtered="onFiltered"
@@ -101,48 +100,48 @@
           }}
         </template>
 
-        <template slot="allowedDivisionsDetails" slot-scope="row">
-          <ul>
-            <li
-              v-for="(item, index) in row.item.allowedDivisionsDetails"
-              :key="item.id"
-              :index="index"
-            >{{row.item.allowedDivisionsDetails[index].name}}</li>
-          </ul>
-        </template>
-
         <template slot="actions" slot-scope="data">
-          <b-button @click="loadRequest(data.item, 'edit')">
-            <i class="fa fa-pencil" title="Editar o registro."></i>
+          <b-button v-b-modal="'mymodal'" @click="loadResource(data.item, 'edit')">
+            <i class="fas fa-pen-square" title="Editar o registro."></i>
           </b-button>
-          <b-button variant="danger" class="ml-1" @click="loadRequest(data.item, 'remove')">
-            <i class="fa fa-trash" title="Excluir o registro."></i>
+
+          <b-button
+            v-b-modal="'mymodal'"
+            variant="danger"
+            class="ml-1"
+            @click="loadResource(data.item, 'remove')"
+          >
+            <i class="far fa-trash-alt" title="Excluir o registro."></i>
           </b-button>
+
           <b-button style="width: 115px" class="ml-1" variant="info" @click="goToStages(data.item)">
-            <i class="fa fa-flag" title="Editar etapas."></i> {{data.item.stages.length}} 
-            etapa<span v-if="data.item.stages.length > 1">s</span>
+            <i class="fa fa-flag" title="Editar etapas."></i>
+            {{data.item.stages.length}}
+            etapa
+            <span v-if="data.item.stages.length > 1">s</span>
           </b-button>
         </template>
       </b-table>
-
-      <b-row>
-        <b-col>
-          <b-button @click="refreshPage();">
-            <i class="fa fa-arrow-left fa-lg mr-1"></i>Novo Cadastro
-          </b-button>
-        </b-col>
-        <b-col>
-          <b-pagination
-            small
-            align="right"
-            v-model="currentPage"
-            :total-rows="totalRows"
-            :per-page="perPage"
-            aria-controls="my-table"
-          ></b-pagination>
-        </b-col>
-      </b-row>
     </div>
+
+    <b-row>
+      <b-col>
+        <b-button v-b-modal="'mymodal'" @click="clearForm">
+          <i class="fas fa-plus"></i> Adicionar
+        </b-button>
+      </b-col>
+      <b-col>
+        <b-pagination
+          small
+          align="right"
+          v-model="currentPage"
+          :total-rows="totalRows"
+          :per-page="perPage"
+          aria-controls="my-table"
+        ></b-pagination>
+      </b-col>
+    </b-row>
+
     <!-- FINAL DA LISTA -->
   </div>
 </template>
@@ -153,31 +152,39 @@ import axios from "axios";
 import PageTitle from "../template/PageTitle";
 import Confirm from "./Confirm";
 
-
-import draggable from "vuedraggable";
-
 export default {
-  name: "RequestAdmin",
-  components: { PageTitle, Confirm, draggable },
-  display: "Handle",
+  name: "requestAdmin",
+  components: { PageTitle, Confirm },
   data: function() {
     return {
-      btnCancelDisabled: false,
+      modalShow: false,
       mode: "save",
-      divisions: [],
+      requests: [],
       request: {},
-      showCad: true,
       totalRows: 1,
       filter: null,
       currentPage: 1,
       perPage: 7,
       pageOptions: [5, 10, 15],
       options: [],
-      requests: [],
       items: [
         {
+          key: "created_at",
+          label: "Cadastro",
+          sortable: true,
+          thClass: "table-th",
+          tdClass: "table-td"
+        },
+        {
           key: "name",
-          label: "Demanda",
+          label: "Nome",
+          sortable: true,
+          thClass: "table-th",
+          tdClass: "table-td"
+        },
+        {
+          key: "name",
+          label: "Nome",
           sortable: true,
           thClass: "table-th",
           tdClass: "table-td"
@@ -193,36 +200,27 @@ export default {
       ]
     };
   },
-  computed: {
-    draggingInfo() {
-      return this.dragging ? "under drag" : "";
-    }
-  },
   methods: {
-    loadDivisions() {
-      const url = `${baseApiUrl}/divisions`;
+    clickModalBtn() {
+      this.modalShow = false;
+    },
+    loadResources() {
+      const url = `${baseApiUrl}/requests`;
       axios.get(url).then(res => {
-        this.divisions = res.data;
+        this.requests = res.data;
+        this.totalRows = res.data.length;
       });
     },
-    loadRequest(request, mode) {
+    loadResource(request, mode) {
       this.mode = mode;
       const url = `${baseApiUrl}/requests/${request._id}`;
       axios.get(url).then(res => {
         this.request = res.data;
-        this.showCad = !this.showCad;
-      });
-    },
-    goToStages(request) {
-      const url = `${baseApiUrl}/requests/${request._id}`;
-      axios.get(url).then(() => {
-        this.$router.push({ name: "stageAdmin", params: { request } });
       });
     },
     save() {
       const method = this.request._id ? "patch" : "post";
       const id = this.request._id ? `/${this.request._id}` : "";
-
       this.$validator.validateAll().then(success => {
         if (!success) {
           return;
@@ -243,9 +241,6 @@ export default {
         })
         .catch(showError);
     },
-    setFocus() {
-      this.$refs.requestName.$el.focus();
-    },
     showSpanError(campo) {
       let obj = this.errors.items;
       let index = obj.findIndex(val => val.field == campo);
@@ -255,55 +250,37 @@ export default {
         return true;
       }
     },
-    loadRequests() {
-      const url = `${baseApiUrl}/requests`;
-      axios.get(url).then(res => {
-        this.requests = res.data;
-        this.totalRows = res.data.length;
-      });
-    },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    refresh(isCleaningForm) {
-      let doRefreshPage = true;
-
-      if (!isCleaningForm) {
-        switch (this.mode) {
-          case "save":
-            this.loadRequests();
-            this.$toasted.global.defaultSuccess({
-              msg: `Registro inserido com sucesso. ${this.totalRows +
-                1} registro(s) até agora.`
-            });
-            break;
-          case "edit":
-            this.$toasted.global.defaultSuccess({
-              msg: "Registro editado com sucesso."
-            });
-            doRefreshPage = false;
-            break;
-          case "remove":
-            this.$toasted.global.defaultSuccess({
-              msg: "Registro excluído do sistema com sucesso."
-            });
-            this.showCad = false;
-            doRefreshPage = false;
-            break;
-        }
+    refresh() {
+      switch (this.mode) {
+        case "save":
+          this.$toasted.global.defaultSuccess({
+            msg: `Registro inserido com sucesso. ${this.totalRows +
+              1} registro(s) até agora.`
+          });
+          break;
+        case "edit":
+          this.$toasted.global.defaultSuccess({
+            msg: "Registro editado com sucesso."
+          });
+          break;
+        case "remove":
+          this.$toasted.global.defaultSuccess({
+            msg: "Registro excluído do sistema com sucesso."
+          });
+          break;
       }
-
-      this.loadRequests();
-
-      if (doRefreshPage) {
-        this.refreshPage();
-      }
+      this.clearForm();
     },
-    refreshPage() {
-      let msg = "Formulário pronto para nova inserção.";
-      this.$router.push(`/admin/confirm?origin=requests&msg=${msg}`);
+    clearForm() {
+      this.clickModalBtn();
+      this.loadResources();
+      this.request = {};
+      this.mode = "save";
     },
     submitByKey() {
       if (this.mode === "save" || this.mode === "edit") {
@@ -311,43 +288,22 @@ export default {
       } else if (this.mode === "remove") {
         this.remove();
       }
-    }
+    },
+    goToStages(request) {
+      const url = `${baseApiUrl}/requests/${request._id}`;
+      axios.get(url).then(() => {
+        this.$router.push({ name: "stageAdmin", params: { request } });
+      });
+    },
   },
   mounted() {
-    
-    if (this.$route.params.showCad !== undefined) {
-      this.showCad = this.$route.params.showCad;
-    } 
-
     if (!this.mode) {
       this.mode = "save";
     }
-
-    this.loadRequests();
-    this.loadDivisions();
-    this.setFocus();
+    this.loadResources();
   }
 };
 </script>
-<style scoped>
-.button {
-  margin-top: 35px;
-}
-.handle {
-  float: left;
-  padding-top: 8px;
-  padding-bottom: 8px;
-}
-.close {
-  float: right;
-  padding-top: 8px;
-  padding-bottom: 8px;
-}
-input {
-  display: inline-block;
-  width: 50%;
-}
-.text {
-  margin: 20px;
-}
+
+<style>
 </style>

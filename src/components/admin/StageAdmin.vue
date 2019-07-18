@@ -39,7 +39,7 @@
                       <b-row>
                         <b-col md="1">
                           <i
-                            class="fa fa-arrows handle mr-3"
+                            class="fas fa-arrows-alt handle mr-3"
                             style="cursor: pointer"
                             title="Arrastar..."
                           ></i>
@@ -126,7 +126,7 @@
                       </b-col>
                       <b-col md="4">
                         <b-button variant="primary" style="width:100%" class="mt-1" @click="save">
-                          <i class="fa fa-save mr-1"></i>Salvar Alterações
+                          <i class="fas fa-save mr-1"></i>Salvar Alterações
                         </b-button>
                       </b-col>
                       <b-col md="4">

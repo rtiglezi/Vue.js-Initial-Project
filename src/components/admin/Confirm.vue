@@ -10,7 +10,7 @@ export default {
     let origin = this.$route.query.origin;
     let msg = this.$route.query.msg;
     this.$toasted.global.defaultConfirm({msg});
-    this.$router.push(`/admin/${origin}`);
+    this.$router.push(`/admin/${origin}?refresh=true`);
   }
 };
 </script>
