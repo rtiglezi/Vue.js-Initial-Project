@@ -8,7 +8,6 @@ import DivisionAdmin from "@/components/admin/DivisionAdmin";
 import RequestAdmin from "@/components/admin/RequestAdmin";
 import StageAdmin from "@/components/admin/StageAdmin";
 
-import Confirm from "@/components/admin/Confirm";
 import Auth from "@/components/auth/Auth";
 import Profile from "@/components/admin/Profile";
 
@@ -50,12 +49,6 @@ const routes = [
     name: "stageAdmin",
     path: "/admin/stages",
     component: StageAdmin,
-    meta: { requiresAdmin: true }
-  },
-  {
-    name: "confirm",
-    path: "/admin/confirm",
-    component: Confirm,
     meta: { requiresAdmin: true }
   }
 ];

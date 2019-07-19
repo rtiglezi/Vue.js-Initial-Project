@@ -4,7 +4,7 @@
       <b-navbar-brand href="#" class="header-title" @click="navigate('/')">
         <img src="@/assets/c-proc.png" alt="Logo" width="30" />ceproc
       </b-navbar-brand>
-      <span class="mr-3 client">{{ user.tenant_alias }}</span>
+      <span class="mr-3 client">[{{ user.tenant }}]</span>
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
@@ -67,15 +67,19 @@
 </template>
 
 <script>
+
 import { userKey } from "@/global";
 import { mapState } from "vuex";
+
 export default {
   name: "Header",
   computed: mapState(["user"]),
   props: {
     title: String,
-    hideToggle: Boolean,
-    hideUserDropdown: Boolean
+  },
+  data: function(){
+    return {
+    }
   },
   methods: {
     navigate(link) {
@@ -86,6 +90,8 @@ export default {
       this.$store.commit("setUser", null);
       this.$router.push({ name: "auth" });
     }
+  },
+  mounted(){
   }
 };
 </script>

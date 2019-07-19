@@ -72,7 +72,6 @@
 </template>
 
 <script>
-import Confirm from "./Confirm";
 
 let position = 1;
 
@@ -81,7 +80,7 @@ import draggable from "vuedraggable";
 export default {
   name: "ResultAdmin",
   props: ["stage"],
-  components: { Confirm, draggable },
+  components: { draggable },
   display: "Handle",
   data: function() {
     return {

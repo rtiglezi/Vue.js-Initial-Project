@@ -117,8 +117,7 @@
           <b-button style="width: 115px" class="ml-1" variant="info" @click="goToStages(data.item)">
             <i class="fa fa-flag" title="Editar etapas."></i>
             {{data.item.stages.length}}
-            etapa
-            <span v-if="data.item.stages.length > 1">s</span>
+            etapa(s)
           </b-button>
         </template>
       </b-table>
@@ -150,11 +149,10 @@
 import { baseApiUrl, showError } from "@/global";
 import axios from "axios";
 import PageTitle from "../template/PageTitle";
-import Confirm from "./Confirm";
 
 export default {
   name: "requestAdmin",
-  components: { PageTitle, Confirm },
+  components: { PageTitle },
   data: function() {
     return {
       modalShow: false,
@@ -290,10 +288,7 @@ export default {
       }
     },
     goToStages(request) {
-      const url = `${baseApiUrl}/requests/${request._id}`;
-      axios.get(url).then(() => {
         this.$router.push({ name: "stageAdmin", params: { request } });
-      });
     },
   },
   mounted() {

@@ -157,7 +157,6 @@
 import { baseApiUrl } from "@/global";
 import axios from "axios";
 import PageTitle from "../template/PageTitle";
-import Confirm from "./Confirm";
 import ResultAdmin from "./ResultAdmin";
 
 let position = 1;
@@ -168,7 +167,6 @@ export default {
   name: "StageAdmin",
   components: {
     PageTitle,
-    Confirm,
     draggable,
     ResultAdmin
   },

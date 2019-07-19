@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-content">
+  <div class="auth-content" v-on:keyup.enter="submitByKey">
     <div class="auth-modal">
       <img src="@/assets/c-proc.png" alt="Logo" width="80" align="left" />
       <span class="auth-logo">ceproc</span>
@@ -77,6 +77,13 @@ export default {
           this.txtButton = "Tentar novamente";
           this.lblClass = "lblErr";
         });
+    },
+    submitByKey() {
+      if (!this.forgotPass) {
+        this.signin();
+      } else {
+        this.forgot();
+      }
     }
   },
   mounted() {

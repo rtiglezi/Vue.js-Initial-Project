@@ -248,11 +248,10 @@
 import { baseApiUrl, showError } from "@/global";
 import axios from "axios";
 import PageTitle from "../template/PageTitle";
-import Confirm from "./Confirm";
 
 export default {
   name: "UserAdmin",
-  components: { PageTitle, Confirm },
+  components: { PageTitle },
   data: function() {
     return {
       modalShow: false,
