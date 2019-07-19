@@ -1,25 +1,20 @@
 import Vue from "vue";
-import VeeValidate from "vee-validate";
 
-import "font-awesome/css/font-awesome.css";
+import VeeValidate from "vee-validate";
+import pt_BR from "vee-validate/dist/locale/pt_BR";
+
 import "./config/bootstrap";
 import "./config/msgs";
 import "./config/axios";
 
 import App from "./App";
-import pt_BR from "vee-validate/dist/locale/pt_BR";
 
 import store from "./config/store";
 import router from "./config/router";
 
-import VueSidebarMenu from "vue-sidebar-menu";
-import "vue-sidebar-menu/dist/vue-sidebar-menu.css";
-
 import VueDraggable from "vue-draggable";
 
 Vue.use(VueDraggable);
-
-Vue.use(VueSidebarMenu);
 
 Vue.use(VeeValidate, {
   fieldsBagName: "formFields",

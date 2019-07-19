@@ -9,6 +9,10 @@
             <div class="box">Meus dados</div>
           </div>
           <div>
+            <i class="fa fa-building mr-1"></i>
+            {{ user.tenant }}
+          </div>
+          <div>
             <i class="fa fa-user mr-1"></i>
             {{ user.name }}
           </div>

@@ -1,8 +1,8 @@
 <template>
   <div class="tenant-admin">
     <PageTitle
-      icon="fa fa-building"
-      main="Cadastro de Inquilinos"
+      icon="fa fa-users"
+      main="Cadastro de Usuários"
       sub="Área administrativa de acesso restrito"
     />
 
@@ -245,7 +245,7 @@
 </template>
 
 <script>
-import { baseApiUrl, showError } from "@/global";
+import { baseApiUrl, showError, userKey } from "@/global";
 import axios from "axios";
 import PageTitle from "../template/PageTitle";
 
@@ -254,6 +254,7 @@ export default {
   components: { PageTitle },
   data: function() {
     return {
+      profilesLoggedUser: [],
       modalShow: false,
       btnCancelDisabled: false,
       mode: "save",
@@ -382,9 +383,6 @@ export default {
         })
         .catch(showError);
     },
-    setFocus() {
-      this.$refs.userName.$el.focus();
-    },
     showSpanError(campo) {
       let obj = this.errors.items;
       let index = obj.findIndex(val => val.field == campo);
@@ -441,11 +439,22 @@ export default {
       this.mode = "save";
       this.loadTenants();
       this.loadResources();
-      this.setFocus();
-      this.profiles = [{ name: "admin" }];
+      this.getProfilesLoggedUser();
+
+      if (this.profilesLoggedUser.indexOf("master") != -1) {
+        this.profiles = [{ name: "admin" }];
+      } else {
+        this.profiles = [];
+      }
+
       this.user = {
         profiles: ["user"]
-      }
+      };
+    },
+
+    getProfilesLoggedUser() {
+      let loggedUser = JSON.parse(localStorage.getItem(userKey));
+      this.profilesLoggedUser = loggedUser.profiles;
     }
   },
   mounted() {
