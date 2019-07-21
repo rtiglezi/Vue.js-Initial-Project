@@ -5,7 +5,7 @@
       <b-row>
         <b-col>
           <draggable class="row">
-            <input type="hidden" v-model="request.stages" />
+            <input type="hidden" v-model="demand.stages" />
 
             <draggable class="col-12">
               <draggable tag="ul" :list="list" class="list-group" handle=".handle">
@@ -84,7 +84,7 @@ export default {
   display: "Handle",
   data: function() {
     return {
-      request: {},
+      demand: {},
       list: [{}],
       dragging: false
     };
@@ -129,7 +129,7 @@ input {
 .text {
   margin: 20px;
 }
-.descRequest {
+.descDemand {
   font-weight: bold;
   font-size: 1.3em;
 }

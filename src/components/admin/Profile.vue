@@ -10,7 +10,7 @@
           </div>
           <div>
             <i class="fa fa-building mr-1"></i>
-            {{ user.tenant }}
+            {{ user.tenantAlias }}
           </div>
           <div>
             <i class="fa fa-user mr-1"></i>

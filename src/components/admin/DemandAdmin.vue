@@ -1,7 +1,7 @@
 <template>
-  <div class="request-admin">
+  <div class="demand-admin">
     <PageTitle
-      icon="fa fa-tags"
+      icon="fa fa-tasks"
       main="Cadastro de Demandas"
       sub="Área administrativa de acesso restrito"
     />
@@ -19,17 +19,17 @@
           <b-card class="box">
             <b-row>
               <b-col md="3" sm="12" class="box-ico">
-                <i class="fa fa-tags fa-5x" aria-hidden="true"></i>
+                <i class="fa fa-tasks fa-5x" aria-hidden="true"></i>
                 <br />Cadastro de Demanda
               </b-col>
               <b-col md="9" sm="12">
-                <b-form-group label="Nome da Demanda *" label-for="requestName">
+                <b-form-group label="Nome da Demanda *" label-for="demandName">
                   <b-form-input
                     class="input-text"
-                    ref="requestName"
+                    ref="demandName"
                     name="Nome"
-                    id="requestName"
-                    v-model="request.name"
+                    id="demandName"
+                    v-model="demand.name"
                     :readonly="mode === 'remove'"
                     v-validate="{ required: true, min: 3 }"
                   ></b-form-input>
@@ -80,7 +80,7 @@
 
       <b-table
         id="my-table"
-        :items="requests"
+        :items="demands"
         :per-page="perPage"
         :current-page="currentPage"
         small
@@ -151,14 +151,14 @@ import axios from "axios";
 import PageTitle from "../template/PageTitle";
 
 export default {
-  name: "requestAdmin",
+  name: "demandAdmin",
   components: { PageTitle },
   data: function() {
     return {
       modalShow: false,
       mode: "save",
-      requests: [],
-      request: {},
+      demands: [],
+      demand: {},
       totalRows: 1,
       filter: null,
       currentPage: 1,
@@ -203,27 +203,27 @@ export default {
       this.modalShow = false;
     },
     loadResources() {
-      const url = `${baseApiUrl}/requests`;
+      const url = `${baseApiUrl}/demands`;
       axios.get(url).then(res => {
-        this.requests = res.data;
+        this.demands = res.data;
         this.totalRows = res.data.length;
       });
     },
-    loadResource(request, mode) {
+    loadResource(demand, mode) {
       this.mode = mode;
-      const url = `${baseApiUrl}/requests/${request._id}`;
+      const url = `${baseApiUrl}/demands/${demand._id}`;
       axios.get(url).then(res => {
-        this.request = res.data;
+        this.demand = res.data;
       });
     },
     save() {
-      const method = this.request._id ? "patch" : "post";
-      const id = this.request._id ? `/${this.request._id}` : "";
+      const method = this.demand._id ? "patch" : "post";
+      const id = this.demand._id ? `/${this.demand._id}` : "";
       this.$validator.validateAll().then(success => {
         if (!success) {
           return;
         }
-        axios[method](`${baseApiUrl}/requests${id}`, this.request)
+        axios[method](`${baseApiUrl}/demands${id}`, this.demand)
           .then(() => {
             this.refresh();
           })
@@ -231,9 +231,9 @@ export default {
       });
     },
     remove() {
-      const id = this.request._id;
+      const id = this.demand._id;
       axios
-        .delete(`${baseApiUrl}/requests/${id}`)
+        .delete(`${baseApiUrl}/demands/${id}`)
         .then(() => {
           this.refresh();
         })
@@ -277,7 +277,7 @@ export default {
     clearForm() {
       this.clickModalBtn();
       this.loadResources();
-      this.request = {};
+      this.demand = {};
       this.mode = "save";
     },
     submitByKey() {
@@ -287,8 +287,8 @@ export default {
         this.remove();
       }
     },
-    goToStages(request) {
-        this.$router.push({ name: "stageAdmin", params: { request } });
+    goToStages(demand) {
+        this.$router.push({ name: "stageAdmin", params: { demand } });
     },
   },
   mounted() {

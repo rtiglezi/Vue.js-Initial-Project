@@ -7,19 +7,23 @@
     />
 
     <b-modal
-      size="lg"
+      size="xl"
       v-bind:hide-footer="true"
       id="mymodal"
       v-model="modalShow"
-      title="Cadastro de Inquilino"
+      title="Cadastro de Usuário"
     >
       <!-- INICIO FORMULÁRIO DE CADASTRO -->
       <b-form v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
-        <b-card class="mb-2 box-out">
+        
+      <b-row>
+        <b-col md="6" sm="12">
+
+           <b-card class="mb-2 box-out">
           <b-card class="box">
             <b-row>
               <b-col md="3" sm="12" class="box-ico">
-                <i class="fa fa-user fa-5x" aria-hidden="true"></i>
+                <i class="fa fa-users fa-5x" aria-hidden="true"></i>
                 <br />Dados Cadastrais
               </b-col>
               <b-col md="9" sm="12">
@@ -60,11 +64,14 @@
           </b-card>
         </b-card>
 
-        <b-card class="mb-3 box-out">
+        </b-col>
+        <b-col md="6" sm="12">
+
+          <b-card class="mb-3 box-out">
           <b-card class="box">
             <b-row>
               <b-col md="3" sm="12" class="box-ico">
-                <i class="fas fa-user-lock fa-5x" aria-hidden="true"></i>
+                <i class="fas fa-key fa-5x" aria-hidden="true"></i>
                 <br />Permissões
               </b-col>
 
@@ -106,7 +113,7 @@
                 <hr />
                 <b-row>
                   <b-col>
-                    <b-form-group label="Perfil(is) de acesso:" label-for="user-profiles">
+                    <b-form-group label="Perfil de acesso:" label-for="user-profiles">
                       <b-form-checkbox-group
                         stacked
                         id="user-profiles"
@@ -127,6 +134,18 @@
             </b-row>
           </b-card>
         </b-card>
+
+        </b-col>
+        
+      </b-row>  
+      
+      
+       
+
+        
+
+
+
 
         <div class="text-right">
           <b-button class="btn-main ml-2" v-if="mode === 'save'" @click="save">
@@ -352,6 +371,7 @@ export default {
       const url = `${baseApiUrl}/users/${user._id}`;
       axios.get(url).then(res => {
         this.user = res.data;
+        this.loadDivisions(this.user.tenant);
       });
     },
     save() {

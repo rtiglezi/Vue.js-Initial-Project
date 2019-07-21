@@ -22,12 +22,12 @@
             <b-col md="3" sm="12" class="box-ico">
               <i class="fa fa-flag fa-5x" aria-hidden="true"></i>
               <br />A Demanda
-              <div class="descRequest">{{ request.name }}</div>tem
+              <div class="descDemand">{{ demand.name }}</div>tem
               <span style="font-size:1.3em; font-weight:bold">{{list.length}}</span> etapa(s) adicionada(s)
             </b-col>
             <b-col md="9" sm="12">
               <draggable class="row">
-                <input type="hidden" v-model="request.stages" />
+                <input type="hidden" v-model="demand.stages" />
 
                 <draggable class="col-12">
                   <draggable tag="ul" :list="list" class="list-group" handle=".handle">
@@ -134,7 +134,7 @@
                           variant="secondary"
                           style="width:100%"
                           class="mt-1"
-                          @click="backToRequests()"
+                          @click="backToDemands()"
                         >
                           Voltar ao Cadastro de Demandas
                           <i class="fa fa-arrow-right fa-lg ml-1"></i>
@@ -174,7 +174,7 @@ export default {
   divisions: [],
   data: function() {
     return {
-      request: {},
+      demand: {},
       list: [],
       dragging: false
     };
@@ -191,11 +191,11 @@ export default {
         this.divisions = res.data;
       });
     },
-    loadRequest(request) {
-      const url = `${baseApiUrl}/requests/${request._id}`;
+    loadDemand(demand) {
+      const url = `${baseApiUrl}/demands/${demand._id}`;
       axios.get(url).then(res => {
-        this.request = res.data;
-        const url2 = `${baseApiUrl}/requests/${request._id}/stages`;
+        this.demand = res.data;
+        const url2 = `${baseApiUrl}/demands/${demand._id}/stages`;
         axios.get(url2).then(res2 => {
           this.list = res2.data;
         });
@@ -203,7 +203,7 @@ export default {
     },
     save() {
       axios["put"](
-        `${baseApiUrl}/requests/${this.request._id}/stages`,
+        `${baseApiUrl}/demands/${this.demand._id}/stages`,
         this.list
       )
         .then(() => {
@@ -213,8 +213,8 @@ export default {
         })
         .catch();
     },
-    backToRequests() {
-      this.$router.push({ name: "requestAdmin", params: { showCad: false } });
+    backToDemands() {
+      this.$router.push({ name: "demandAdmin", params: { showCad: false } });
     },
     removeAt(idx) {
       this.list.splice(idx, 1);
@@ -242,8 +242,8 @@ export default {
     }
   },
   mounted() {
-    this.request = this.$route.params.request;
-    this.loadRequest(this.request);
+    this.demand = this.$route.params.demand;
+    this.loadDemand(this.demand);
     this.loadDivisions();
   }
 };
@@ -269,7 +269,7 @@ input {
 .text {
   margin: 20px;
 }
-.descRequest {
+.descDemand {
   font-weight: bold;
   font-size: 1.3em;
 }

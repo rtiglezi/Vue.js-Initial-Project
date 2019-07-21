@@ -5,8 +5,10 @@ import Home from "@/components/home/Home";
 import TenantAdmin from "@/components/admin/TenantAdmin";
 import UserAdmin from "@/components/admin/UserAdmin";
 import DivisionAdmin from "@/components/admin/DivisionAdmin";
-import RequestAdmin from "@/components/admin/RequestAdmin";
+import DemandAdmin from "@/components/admin/DemandAdmin";
 import StageAdmin from "@/components/admin/StageAdmin";
+import ProcessList from "@/components/process/Process";
+
 
 import Auth from "@/components/auth/Auth";
 import Profile from "@/components/admin/Profile";
@@ -40,9 +42,9 @@ const routes = [
     meta: { requiresAdmin: true }
   },
   {
-    name: "requestAdmin",
-    path: "/admin/requests",
-    component: RequestAdmin,
+    name: "demandAdmin",
+    path: "/admin/demands",
+    component: DemandAdmin,
     meta: { requiresAdmin: true }
   },
   {
@@ -50,6 +52,12 @@ const routes = [
     path: "/admin/stages",
     component: StageAdmin,
     meta: { requiresAdmin: true }
+  },
+  {
+    name: "process",
+    path: "/processes",
+    component: ProcessList,
+    meta: { requiresAdmin: false }
   }
 ];
 
