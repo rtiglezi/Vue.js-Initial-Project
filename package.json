@@ -18,6 +18,7 @@
     "vue-draggable": "^2.0.2",
     "vue-mq": "0.2.1",
     "vue-router": "3.0.1",
+    "vue-the-mask": "^0.11.1",
     "vue-toasted": "1.1.24",
     "vue2-editor": "2.6.6",
     "vuedraggable": "^2.23.0",

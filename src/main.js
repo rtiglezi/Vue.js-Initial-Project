@@ -14,6 +14,10 @@ import router from "./config/router";
 
 import VueDraggable from "vue-draggable";
 
+import VueTheMask from 'vue-the-mask'
+Vue.use(VueTheMask)
+
+
 Vue.use(VueDraggable);
 
 Vue.use(VeeValidate, {

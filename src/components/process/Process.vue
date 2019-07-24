@@ -1,9 +1,6 @@
 <template>
   <div class="tenant-admin">
-    <PageTitle
-      icon="fa fa-folder-open"
-      main="Cadastro de Processos"
-    />
+    <PageTitle icon="fa fa-folder-open" main="Cadastro de Processos" />
 
     <b-modal
       size="xl"
@@ -26,6 +23,7 @@
                   <b-col md="9" sm="12">
                     <b-form-group label="Número *" label-for="processNumber">
                       <b-form-input
+                        v-mask="'#####.######/####-##'"
                         ref="processNumber"
                         name="Numero"
                         id="processNumber"
@@ -108,6 +106,7 @@
                         </b-form-group>
                         <b-form-group label="Documento *" label-for="requesterDocument">
                           <b-form-input
+                            v-mask="'##.###.###/####-##'"
                             ref="requesterDocument"
                             name="Documento"
                             id="requesterDocument"
@@ -115,6 +114,7 @@
                             v-model="process.requester.document"
                             :readonly="mode === 'remove'"
                             v-validate="{ required: true, min: 3 }"
+                            @input="addEvent($event)"
                           ></b-form-input>
                           <span
                             ref="spnDocumento"
@@ -141,21 +141,39 @@
 
                         <b-row>
                           <b-col md="9">
-                            <b-form-group label="Cidade" label-for="requesterCidade">
+                            <b-form-group label="Cidade" label-for="City">
                               <b-form-input
+                                ref="city"
+                                name="Cidade"
+                                id="city"
                                 class="input-text"
-                                v-model="process.requester.addressCity"
+                                v-model="process.city"
                                 :readonly="mode === 'remove'"
+                                 v-validate="{ required: true, min: 3 }"
                               ></b-form-input>
+                              <span
+                            ref="spnCidade"
+                            v-if="showSpanError('Cidade')"
+                            class="adm-msg-error"
+                          >{{ errors.first('Cidade') }}</span>
                             </b-form-group>
                           </b-col>
                           <b-col md="3">
-                            <b-form-group label="UF" label-for="requesterUF">
+                            <b-form-group label="UF" label-for="State">
                               <b-form-input
+                              ref="state"
+                                name="UF"
+                                id="state"
                                 class="input-text"
-                                v-model="process.requester.addressState"
+                                v-model="process.state"
                                 :readonly="mode === 'remove'"
+                                 v-validate="{ required: true, min: 2 }"
                               ></b-form-input>
+                              <span
+                            ref="spnUF"
+                            v-if="showSpanError('UF')"
+                            class="adm-msg-error"
+                          >{{ errors.first('UF') }}</span>
                             </b-form-group>
                           </b-col>
                         </b-row>
@@ -358,7 +376,7 @@ export default {
           tdClass: "table-td"
         },
         {
-          key: "requester.addessCity",
+          key: "city",
           label: "Cidade",
           sortable: true,
           class: "text-center",
@@ -366,7 +384,7 @@ export default {
           tdClass: "table-td"
         },
         {
-          key: "requester.addessUF",
+          key: "state",
           label: "UF",
           sortable: true,
           class: "text-center",
@@ -480,6 +498,75 @@ export default {
       } else if (this.mode === "remove") {
         this.remove();
       }
+    },
+
+    addEvent(e) {
+      let doc = e;
+      doc = doc.replace(".", "");
+      doc = doc.replace(".", "");
+      doc = doc.replace(".", "");
+      doc = doc.replace("/", "");
+      doc = doc.replace("-", "");
+      if (this.validarCNPJ(doc)) {
+        axios
+          .get(
+            `${"https://cors-anywhere.herokuapp.com/"}https://www.receitaws.com.br/v1/cnpj/${doc}`
+          )
+          .then(res => {
+            this.process.requester.name = res.data.nome;
+            this.process.city = res.data.municipio;
+            this.process.state = res.data.uf;
+          });
+      }
+    },
+
+    validarCNPJ(cnpj) {
+      cnpj = cnpj.replace(/[^\d]+/g, "");
+
+      if (cnpj == "") return false;
+
+      if (cnpj.length != 14) return false;
+
+      // Elimina CNPJs invalidos conhecidos
+      if (
+        cnpj == "00000000000000" ||
+        cnpj == "11111111111111" ||
+        cnpj == "22222222222222" ||
+        cnpj == "33333333333333" ||
+        cnpj == "44444444444444" ||
+        cnpj == "55555555555555" ||
+        cnpj == "66666666666666" ||
+        cnpj == "77777777777777" ||
+        cnpj == "88888888888888" ||
+        cnpj == "99999999999999"
+      )
+        return false;
+
+      // Valida DVs
+      let tamanho = cnpj.length - 2;
+      let numeros = cnpj.substring(0, tamanho);
+      let digitos = cnpj.substring(tamanho);
+      let soma = 0;
+      let pos = tamanho - 7;
+      for (let i = tamanho; i >= 1; i--) {
+        soma += numeros.charAt(tamanho - i) * pos--;
+        if (pos < 2) pos = 9;
+      }
+      let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+      if (resultado != digitos.charAt(0)) return false;
+
+      tamanho = tamanho + 1;
+      numeros = cnpj.substring(0, tamanho);
+      soma = 0;
+      pos = tamanho - 7;
+      for (let i = tamanho; i >= 1; i--) {
+        soma += numeros.charAt(tamanho - i) * pos--;
+        if (pos < 2) pos = 9;
+      }
+      resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+      if (resultado != digitos.charAt(1)) return false;
+
+      return true;
     },
 
     firstForm() {
