@@ -3,7 +3,7 @@
     <PageTitle icon="fa fa-folder-open" main="Cadastro de Processos" />
 
     <b-modal
-      size="xl"
+      size="lg"
       v-bind:hide-footer="true"
       id="mymodal"
       v-model="modalShow"
@@ -12,7 +12,7 @@
       <!-- INICIO FORMULÁRIO DE CADASTRO -->
       <b-form v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
         <b-row>
-          <b-col md="6" sm="12">
+          <b-col md="12" sm="12">
             <b-card class="mb-2 box-out">
               <b-card class="box">
                 <b-row>
@@ -41,6 +41,7 @@
                     <b-form-group label="Unidade:" label-for="process-division">
                       <b-form-select
                         name="Unidade"
+                        :disabled="mode === 'remove'"
                         v-model="process.division"
                         v-validate="{ required: true }"
                       >
@@ -58,6 +59,7 @@
                     </b-form-group>
                     <b-form-group label="Demanda:" label-for="process-demand">
                       <b-form-select
+                        :disabled="mode === 'remove'"
                         name="Demanda"
                         v-model="process.demand"
                         v-validate="{ required: true }"
@@ -80,7 +82,7 @@
               </b-card>
             </b-card>
           </b-col>
-          <b-col md="6" sm="12">
+          <b-col md="12" sm="12">
             <b-card class="mb-3 box-out">
               <b-card class="box">
                 <b-row>
@@ -94,18 +96,24 @@
                       <b-col>
                         <b-form-group label="Tipo de solicitante:">
                           <b-form-radio
+                            @change="changePerson($event)"
                             v-model="process.requester.person"
                             name="requester-person"
                             value="PJ"
                           >Pessoa Jurídica</b-form-radio>
                           <b-form-radio
+                            @change="changePerson($event)"
                             v-model="process.requester.person"
                             name="requester-person"
                             value="PF"
                           >Pessoa Física</b-form-radio>
                         </b-form-group>
-                        <b-form-group label="Documento *" label-for="requesterDocument">
+                        <b-form-group
+                          :label="lblDoc(process.requester.person)"
+                          label-for="requesterDocument"
+                        >
                           <b-form-input
+                            v-if="process.requester.person == 'PJ'"
                             v-mask="'##.###.###/####-##'"
                             ref="requesterDocument"
                             name="Documento"
@@ -113,16 +121,42 @@
                             class="input-text"
                             v-model="process.requester.document"
                             :readonly="mode === 'remove'"
-                            v-validate="{ required: true, min: 3 }"
-                            @input="addEvent($event)"
+                            v-validate="{ required: true }"
+                            @input="fillCityUF"
+                          ></b-form-input>
+                          <b-form-input
+                            v-if="process.requester.person == 'PF'"
+                            v-mask="'###.###.###-##'"
+                            ref="requesterDocument"
+                            name="Documento"
+                            id="requesterDocument"
+                            class="input-text"
+                            v-model="process.requester.document"
+                            :readonly="mode === 'remove'"
+                            v-validate="{ required: true }"
+                            @input="fillCityUF"
                           ></b-form-input>
                           <span
                             ref="spnDocumento"
                             v-if="showSpanError('Documento')"
                             class="adm-msg-error"
                           >{{ errors.first('Documento') }}</span>
+
+                          <span
+                            v-if="validarCNPJ(process.requester.document) && !process.requester.name"
+                          >
+                            <b-button
+                              v-if="!loading"
+                              variant="link"
+                              @click="addEvent(process.requester.document)"
+                            >
+                              <i class="fas fa-file-import mr-1"></i>Importar dados
+                            </b-button>
+                            <img v-if="loading" src="@/assets/loading.gif" width="80" alt="loading" />
+                          </span>
                         </b-form-group>
-                        <b-form-group label="Nome *" label-for="requesterName">
+
+                        <b-form-group :label="lblName(process.requester.person)" label-for="requesterName">
                           <b-form-input
                             ref="requesterName"
                             name="Nome"
@@ -141,7 +175,7 @@
 
                         <b-row>
                           <b-col md="9">
-                            <b-form-group label="Cidade" label-for="City">
+                            <b-form-group label="Cidade *" label-for="City">
                               <b-form-input
                                 ref="city"
                                 name="Cidade"
@@ -149,31 +183,31 @@
                                 class="input-text"
                                 v-model="process.city"
                                 :readonly="mode === 'remove'"
-                                 v-validate="{ required: true, min: 3 }"
+                                v-validate="{ required: true, min: 3 }"
                               ></b-form-input>
                               <span
-                            ref="spnCidade"
-                            v-if="showSpanError('Cidade')"
-                            class="adm-msg-error"
-                          >{{ errors.first('Cidade') }}</span>
+                                ref="spnCidade"
+                                v-if="showSpanError('Cidade')"
+                                class="adm-msg-error"
+                              >{{ errors.first('Cidade') }}</span>
                             </b-form-group>
                           </b-col>
                           <b-col md="3">
-                            <b-form-group label="UF" label-for="State">
+                            <b-form-group label="UF *" label-for="State">
                               <b-form-input
-                              ref="state"
+                                ref="state"
                                 name="UF"
                                 id="state"
                                 class="input-text"
                                 v-model="process.state"
                                 :readonly="mode === 'remove'"
-                                 v-validate="{ required: true, min: 2 }"
+                                v-validate="{ required: true, min: 2 }"
                               ></b-form-input>
                               <span
-                            ref="spnUF"
-                            v-if="showSpanError('UF')"
-                            class="adm-msg-error"
-                          >{{ errors.first('UF') }}</span>
+                                ref="spnUF"
+                                v-if="showSpanError('UF')"
+                                class="adm-msg-error"
+                              >{{ errors.first('UF') }}</span>
                             </b-form-group>
                           </b-col>
                         </b-row>
@@ -187,11 +221,21 @@
         </b-row>
 
         <div class="text-right">
-          <b-button class="btn-main ml-2" v-if="mode === 'save'" @click="save">
+          <b-button
+            :disabled="!validarCNPJ(this.process.requester.document) && !validarCPF(this.process.requester.document)"
+            class="btn-main ml-2"
+            v-if="mode === 'save'"
+            @click="save"
+          >
             <i class="fa fa-send fa-lg"></i>
             Inserir
           </b-button>
-          <b-button class="btn-main ml-2" v-if="mode === 'edit'" @click="save">
+          <b-button
+            :disabled="!validarCNPJ(this.process.requester.document) && !validarCPF(this.process.requester.document)"
+            class="btn-main ml-2"
+            v-if="mode === 'edit'"
+            @click="save"
+          >
             <i class="fas fa-save fa-lg"></i>
             Salvar Edição
           </b-button>
@@ -315,6 +359,7 @@ export default {
   components: { PageTitle },
   data: function() {
     return {
+      loading: false,
       modalShow: false,
       btnCancelDisabled: false,
       mode: "save",
@@ -501,6 +546,8 @@ export default {
     },
 
     addEvent(e) {
+      this.loading = true;
+
       let doc = e;
       doc = doc.replace(".", "");
       doc = doc.replace(".", "");
@@ -516,57 +563,127 @@ export default {
             this.process.requester.name = res.data.nome;
             this.process.city = res.data.municipio;
             this.process.state = res.data.uf;
+            this.loading = false;
+          })
+          .catch(() => {
+            this.loading = false;
+            this.$toasted.global.defaultError({
+              msg: `Não foi possível obter resposta. Tente novamente em alguns minutos.`
+            });
           });
       }
     },
 
+    validarCPF(cpf) {
+      if (cpf && this.process.requester.person == "PF") {
+        cpf = cpf.replace('.','').replace('.','').replace('.','').replace('-','')
+        let digitos_iguais = 1;
+        if (cpf.length < 11) return false;
+        for (let i = 0; i < cpf.length - 1; i++)
+          if (cpf.charAt(i) != cpf.charAt(i + 1)) {
+            digitos_iguais = 0;
+            break;
+          }
+        if (!digitos_iguais) {
+          let numeros = cpf.substring(0, 9);
+          let digitos = cpf.substring(9);
+          let soma = 0;
+          for (let i = 10; i > 1; i--) soma += numeros.charAt(10 - i) * i;
+          let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+          if (resultado != digitos.charAt(0)) return false;
+          numeros = cpf.substring(0, 10);
+          soma = 0;
+          for (let i = 11; i > 1; i--) soma += numeros.charAt(11 - i) * i;
+          resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+          if (resultado != digitos.charAt(1)) return false;
+          return true;
+        } else return false;
+      }
+    },
+
     validarCNPJ(cnpj) {
-      cnpj = cnpj.replace(/[^\d]+/g, "");
+      if (cnpj) {
+        cnpj = cnpj.replace(/[^\d]+/g, "");
 
-      if (cnpj == "") return false;
+        if (cnpj == "") return false;
 
-      if (cnpj.length != 14) return false;
+        if (cnpj.length != 14) return false;
 
-      // Elimina CNPJs invalidos conhecidos
-      if (
-        cnpj == "00000000000000" ||
-        cnpj == "11111111111111" ||
-        cnpj == "22222222222222" ||
-        cnpj == "33333333333333" ||
-        cnpj == "44444444444444" ||
-        cnpj == "55555555555555" ||
-        cnpj == "66666666666666" ||
-        cnpj == "77777777777777" ||
-        cnpj == "88888888888888" ||
-        cnpj == "99999999999999"
-      )
-        return false;
+        // Elimina CNPJs invalidos conhecidos
+        if (
+          cnpj == "00000000000000" ||
+          cnpj == "11111111111111" ||
+          cnpj == "22222222222222" ||
+          cnpj == "33333333333333" ||
+          cnpj == "44444444444444" ||
+          cnpj == "55555555555555" ||
+          cnpj == "66666666666666" ||
+          cnpj == "77777777777777" ||
+          cnpj == "88888888888888" ||
+          cnpj == "99999999999999"
+        )
+          return false;
 
-      // Valida DVs
-      let tamanho = cnpj.length - 2;
-      let numeros = cnpj.substring(0, tamanho);
-      let digitos = cnpj.substring(tamanho);
-      let soma = 0;
-      let pos = tamanho - 7;
-      for (let i = tamanho; i >= 1; i--) {
-        soma += numeros.charAt(tamanho - i) * pos--;
-        if (pos < 2) pos = 9;
+        // Valida DVs
+        let tamanho = cnpj.length - 2;
+        let numeros = cnpj.substring(0, tamanho);
+        let digitos = cnpj.substring(tamanho);
+        let soma = 0;
+        let pos = tamanho - 7;
+        for (let i = tamanho; i >= 1; i--) {
+          soma += numeros.charAt(tamanho - i) * pos--;
+          if (pos < 2) pos = 9;
+        }
+        let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+        if (resultado != digitos.charAt(0)) return false;
+
+        tamanho = tamanho + 1;
+        numeros = cnpj.substring(0, tamanho);
+        soma = 0;
+        pos = tamanho - 7;
+        for (let i = tamanho; i >= 1; i--) {
+          soma += numeros.charAt(tamanho - i) * pos--;
+          if (pos < 2) pos = 9;
+        }
+        resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+        if (resultado != digitos.charAt(1)) return false;
+
+        return true;
       }
-      let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
-      if (resultado != digitos.charAt(0)) return false;
+    },
 
-      tamanho = tamanho + 1;
-      numeros = cnpj.substring(0, tamanho);
-      soma = 0;
-      pos = tamanho - 7;
-      for (let i = tamanho; i >= 1; i--) {
-        soma += numeros.charAt(tamanho - i) * pos--;
-        if (pos < 2) pos = 9;
+    fillCityUF() {
+      if (this.process.requester.person == "PJ") {
+        if (!this.validarCNPJ(this.process.requester.document)) {
+          this.process.requester.name = "";
+          this.process.city = "";
+          this.process.state = "";
+        }
       }
-      resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
-      if (resultado != digitos.charAt(1)) return false;
+    },
 
-      return true;
+    lblDoc(val) {
+      if (val) {
+        if (val == "PF") {
+          return "CPF:";
+        } else {
+          return "CNPJ:";
+        }
+      }
+    },
+
+    lblName(val) {
+      if (val) {
+        if (val == "PF") {
+          return "Nome:";
+        } else {
+          return "Razão Social:";
+        }
+      }
+    },
+
+    changePerson(val) {
+      this.process.requester.person = val;
     },
 
     firstForm() {
