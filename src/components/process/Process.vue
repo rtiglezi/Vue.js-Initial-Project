@@ -38,7 +38,7 @@
                         class="adm-msg-error"
                       >{{ errors.first('Numero') }}</span>
                     </b-form-group>
-                    <b-form-group label="Unidade:" label-for="process-division">
+                    <b-form-group label="Unidade *" label-for="process-division">
                       <b-form-select
                         name="Unidade"
                         :disabled="mode === 'remove'"
@@ -57,7 +57,7 @@
                         class="adm-msg-error"
                       >{{ errors.first('Unidade') }}</span>
                     </b-form-group>
-                    <b-form-group label="Demanda:" label-for="process-demand">
+                    <b-form-group label="Demanda *" label-for="process-demand">
                       <b-form-select
                         :disabled="mode === 'remove'"
                         name="Demanda"
@@ -156,7 +156,10 @@
                           </span>
                         </b-form-group>
 
-                        <b-form-group :label="lblName(process.requester.person)" label-for="requesterName">
+                        <b-form-group
+                          :label="lblName(process.requester.person)"
+                          label-for="requesterName"
+                        >
                           <b-form-input
                             ref="requesterName"
                             name="Nome"
@@ -278,48 +281,54 @@
         @filtered="onFiltered"
       >
         <template slot="updated_at" slot-scope="row">
-          {{
-          (new Date(row.item.created_at).getDate().toString().length == 1) ? "0" + new Date(row.item.created_at).getDate() : new Date(row.item.created_at).getDate()
-          }}/{{
-          ((new Date(row.item.created_at).getMonth() + 1).toString().length == 1) ? "0" + (new Date(row.item.created_at).getMonth()+1) : (new Date(row.item.created_at).getMonth())+1
-          }}/{{
-          new Date(row.item.created_at).getFullYear()
-          }}
+          <div style="color:#888">
+            {{
+            (new Date(row.item.updated_at).getDate().toString().length == 1) ? "0" + new Date(row.item.updated_at).getDate() : new Date(row.item.updated_at).getDate()
+            }}/{{
+            ((new Date(row.item.updated_at).getMonth() + 1).toString().length == 1) ? "0" + (new Date(row.item.updated_at).getMonth()+1) : (new Date(row.item.updated_at).getMonth())+1
+            }}/{{
+            new Date(row.item.updated_at).getFullYear()
+            }}
+          </div>
         </template>
 
-        <template slot="divisionDetails" slot-scope="row">
-          <div
-            v-for="(item, index) in row.item.divisionDetails"
-            :key="item.id"
-            :index="index"
-          >{{row.item.divisionDetails[index].name}}</div>
+        <template slot="array_stages" slot-scope="row">
+          <div v-for="(item,index) in row.item.array_stages" :key="item._id" :index="index">
+            <div style="color:red; font-weight:bold" v-if="item._id === row.item.stage_id">
+              {{ item.name}}
+            </div>
+          </div>
         </template>
 
-        <template slot="demandDetails" slot-scope="row">
-          <div
-            v-for="(item, index) in row.item.demandDetails"
-            :key="item.id"
-            :index="index"
-          >{{row.item.demandDetails[index].name}}</div>
-        </template>
-
-        <template slot="requester" slot-scope="row">
-          <div>{{row.item.requester.name}}</div>
+        <template slot="number" slot-scope="row">
+          <a
+            style="color:#006999; font-weight: bold"
+            href="#"
+            v-b-modal="'mymodal'"
+            @click="loadResource(row.item, 'edit')"
+          >{{row.item.number}}</a>
         </template>
 
         <template slot="actions" slot-scope="data">
-          <b-button v-b-modal="'mymodal'" @click="loadResource(data.item, 'edit')">
-            <i class="fas fa-pen-square" title="Editar o registro."></i>
-          </b-button>
-
-          <b-button
+          <a
+            href="#"
+            v-b-modal="'mymodal'"
+            variant="danger"
+            class="ml-1"
+            @click="loadResource(data.item, 'edit')"
+          >
+            <i class="far fa-edit" title="Editar o registro."></i>
+          </a>
+          <a
+            href="#"
             v-b-modal="'mymodal'"
             variant="danger"
             class="ml-1"
             @click="loadResource(data.item, 'remove')"
+            style="color:red"
           >
             <i class="far fa-trash-alt" title="Excluir o registro."></i>
-          </b-button>
+          </a>
         </template>
       </b-table>
     </div>
@@ -389,16 +398,8 @@ export default {
           tdClass: "table-td"
         },
         {
-          key: "divisionDetails",
+          key: "division_name",
           label: "Unidade:",
-          sortable: true,
-          class: "text-center",
-          thClass: "table-th",
-          tdClass: "table-td"
-        },
-        {
-          key: "demandDetails",
-          label: "Demanda:",
           sortable: true,
           class: "text-center",
           thClass: "table-th",
@@ -412,8 +413,18 @@ export default {
           thClass: "table-th",
           tdClass: "table-td"
         },
+
         {
-          key: "requester",
+          key: "demand_name",
+          label: "Demanda:",
+          sortable: true,
+          class: "text-center",
+          thClass: "table-th",
+          tdClass: "table-td"
+        },
+
+        {
+          key: "requester_name",
           label: "Solicitante",
           sortable: true,
           class: "text-center",
@@ -431,6 +442,22 @@ export default {
         {
           key: "state",
           label: "UF",
+          sortable: true,
+          class: "text-center",
+          thClass: "table-th",
+          tdClass: "table-td"
+        },
+        {
+          key: "array_stages",
+          label: "Andamento",
+          sortable: true,
+          class: "text-center",
+          thClass: "table-th",
+          tdClass: "table-td"
+        },
+        {
+          key: "atribuicao",
+          label: "Atribuição",
           sortable: true,
           class: "text-center",
           thClass: "table-th",
@@ -471,6 +498,7 @@ export default {
       });
     },
     loadResource(process, mode) {
+      this.process = { requester: { person: "PJ" } };
       this.mode = mode;
       const url = `${baseApiUrl}/processes/${process._id}`;
       axios.get(url).then(res => {
@@ -576,7 +604,11 @@ export default {
 
     validarCPF(cpf) {
       if (cpf && this.process.requester.person == "PF") {
-        cpf = cpf.replace('.','').replace('.','').replace('.','').replace('-','')
+        cpf = cpf
+          .replace(".", "")
+          .replace(".", "")
+          .replace(".", "")
+          .replace("-", "");
         let digitos_iguais = 1;
         if (cpf.length < 11) return false;
         for (let i = 0; i < cpf.length - 1; i++)
@@ -665,9 +697,9 @@ export default {
     lblDoc(val) {
       if (val) {
         if (val == "PF") {
-          return "CPF:";
+          return "CPF *";
         } else {
-          return "CNPJ:";
+          return "CNPJ *";
         }
       }
     },
@@ -675,9 +707,9 @@ export default {
     lblName(val) {
       if (val) {
         if (val == "PF") {
-          return "Nome:";
+          return "Nome *";
         } else {
-          return "Razão Social:";
+          return "Razão Social *";
         }
       }
     },
