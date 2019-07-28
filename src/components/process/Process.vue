@@ -292,9 +292,9 @@
           </div>
         </template>
 
-        <template slot="array_stages" slot-scope="row">
-          <div v-for="(item,index) in row.item.array_stages" :key="item._id" :index="index">
-            <div style="color:red; font-weight:bold" v-if="item._id === row.item.stage_id">
+        <template slot="arrayStages" slot-scope="row">
+          <div v-for="(item,index) in row.item.arrayStages" :key="item._id" :index="index">
+            <div style="color:red; font-weight:bold" v-if="item._id === row.item.stageId">
               {{ item.name}}
             </div>
           </div>
@@ -398,7 +398,7 @@ export default {
           tdClass: "table-td"
         },
         {
-          key: "division_name",
+          key: "divisionName",
           label: "Unidade:",
           sortable: true,
           class: "text-center",
@@ -415,7 +415,7 @@ export default {
         },
 
         {
-          key: "demand_name",
+          key: "demandName",
           label: "Demanda:",
           sortable: true,
           class: "text-center",
@@ -424,7 +424,7 @@ export default {
         },
 
         {
-          key: "requester_name",
+          key: "requesterName",
           label: "Solicitante",
           sortable: true,
           class: "text-center",
@@ -448,7 +448,7 @@ export default {
           tdClass: "table-td"
         },
         {
-          key: "array_stages",
+          key: "arrayStages",
           label: "Andamento",
           sortable: true,
           class: "text-center",
