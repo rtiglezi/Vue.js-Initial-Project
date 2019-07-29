@@ -125,7 +125,7 @@ export default {
   color: #c8a741;
 }
 .header .client {
-  color: #f2e15d;
+  color: greenyellow;
   font-weight: bold;
 }
 </style>

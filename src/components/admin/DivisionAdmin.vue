@@ -39,7 +39,6 @@
                     class="adm-msg-error"
                   >{{ errors.first('Nome') }}</span>
                 </b-form-group>
-
               </b-col>
             </b-row>
           </b-card>
@@ -266,7 +265,7 @@ export default {
             msg: "Registro excluído do sistema com sucesso."
           });
           break;
-       }
+      }
       this.clearForm();
     },
     clearForm() {

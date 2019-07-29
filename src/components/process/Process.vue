@@ -294,7 +294,7 @@
 
         <template slot="arrayStages" slot-scope="row">
           <div v-for="(item,index) in row.item.arrayStages" :key="item._id" :index="index">
-            <div style="color:red; font-weight:bold" v-if="item._id === row.item.stageId">
+            <div style="color:brown" v-if="item._id === row.item.stageId">
               {{ item.name}}
             </div>
           </div>
@@ -416,7 +416,7 @@ export default {
 
         {
           key: "demandName",
-          label: "Demanda:",
+          label: "Demanda",
           sortable: true,
           class: "text-center",
           thClass: "table-th",
@@ -449,7 +449,7 @@ export default {
         },
         {
           key: "arrayStages",
-          label: "Andamento",
+          label: "Última Etapa",
           sortable: true,
           class: "text-center",
           thClass: "table-th",
