@@ -294,9 +294,7 @@
 
         <template slot="arrayStages" slot-scope="row">
           <div v-for="(item,index) in row.item.arrayStages" :key="item._id" :index="index">
-            <div style="color:brown" v-if="item._id === row.item.stageId">
-              {{ item.name}}
-            </div>
+            <div style="color:brown" v-if="item._id === row.item.stageId">{{ item.name}}</div>
           </div>
         </template>
 
@@ -305,7 +303,7 @@
             style="color:#006999; font-weight: bold"
             href="#"
             v-b-modal="'mymodal'"
-            @click="loadResource(row.item, 'edit')"
+            @click.prevent="goToProcess(row.item)"
           >{{row.item.number}}</a>
         </template>
 
@@ -315,7 +313,7 @@
             v-b-modal="'mymodal'"
             variant="danger"
             class="ml-1"
-            @click="loadResource(data.item, 'edit')"
+            @click.prevent="loadResource(data.item, 'edit')"
           >
             <i class="far fa-edit" title="Editar o registro."></i>
           </a>
@@ -324,7 +322,7 @@
             v-b-modal="'mymodal'"
             variant="danger"
             class="ml-1"
-            @click="loadResource(data.item, 'remove')"
+            @click.prevent="loadResource(data.item, 'remove')"
             style="color:red"
           >
             <i class="far fa-trash-alt" title="Excluir o registro."></i>
@@ -730,7 +728,12 @@ export default {
       };
       this.loadDivisions(this.user.tenant);
       this.loadDemands(this.user.tenant);
+    },
+
+    goToProcess(process) {
+      this.$router.push({ name: "processDetails", params: { process } });
     }
+
   },
   mounted() {
     this.firstForm();

@@ -23,6 +23,8 @@ import Menu from 'primevue/menu';
 import Fieldset from 'primevue/fieldset';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
+import OverlayPanel from 'primevue/overlaypanel';
+
 
 Vue.component('InputText', InputText);
 Vue.component('Button', Button);
@@ -30,6 +32,7 @@ Vue.component('Menu', Menu);
 Vue.component('Fieldset', Fieldset);
 Vue.component('Accordion', Accordion);
 Vue.component('AccordionTab', AccordionTab);
+Vue.component('OverlayPanel', OverlayPanel);
 
 import 'primevue/resources/themes/nova-light/theme.css';
 import 'primevue/resources/primevue.min.css';
