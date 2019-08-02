@@ -124,6 +124,14 @@ body {
   font-size: 15px;
 }
 
+.table-th2 {
+  background-color: #8fdfa0;
+  color: #333;
+  font-weight: 100;
+}
+
+
+
 .layer-total {
   background-color: #006999;
   color: #333;
@@ -131,6 +139,15 @@ body {
   font-weight: 100;
   color: white;
 }
+
+.layer-total2 {
+  background-color: #249900;
+  color: #333;
+  text-align: center;
+  font-weight: 100;
+  color: white;
+}
+
 
 .input-text {
   border: 1px solid #ccc;

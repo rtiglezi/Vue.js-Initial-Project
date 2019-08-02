@@ -1,7 +1,6 @@
 <template>
   <div class="tenant-admin">
-    <PageTitle icon="fa fa-folder-open" main="Cadastro de Processos" />
-
+    
     <b-modal
       size="lg"
       v-bind:hide-footer="true"
@@ -292,11 +291,11 @@
           </div>
         </template>
 
-        <template slot="arrayStages" slot-scope="row">
+        <!-- <template slot="arrayStages" slot-scope="row">
           <div v-for="(item,index) in row.item.arrayStages" :key="item._id" :index="index">
             <div style="color:brown" v-if="item._id === row.item.stageId">{{ item.name}}</div>
           </div>
-        </template>
+        </template> -->
 
         <template slot="number" slot-scope="row">
           <a
@@ -445,14 +444,14 @@ export default {
           thClass: "table-th",
           tdClass: "table-td"
         },
-        {
-          key: "arrayStages",
-          label: "Última Etapa",
-          sortable: true,
-          class: "text-center",
-          thClass: "table-th",
-          tdClass: "table-td"
-        },
+        // {
+        //   key: "arrayStages",
+        //   label: "Última Etapa",
+        //   sortable: true,
+        //   class: "text-center",
+        //   thClass: "table-th",
+        //   tdClass: "table-td"
+        // },
         {
           key: "atribuicao",
           label: "Atribuição",
