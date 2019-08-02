@@ -5,79 +5,80 @@
       size="lg"
       v-bind:hide-footer="true"
       id="modal-1"
-      title="Registro de andamento"
+      style="color: green; font-weight: bold"
+      title="Registro de andamento no processo"
+      
     >
       <!-- INICIO FORMULÁRIO DE CADASTRO -->
-
-      {{ obj }}
       <b-form v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
-        <b-card class="mb-3 box-out">
-          <b-card class="box">
-            <b-row>
-              <b-col style="color: green" md="4" sm="12" class="box-ico">
-                <i class="fa fa-flag fa-5x" aria-hidden="true"></i>
-                <br />Registrando a etapa
-              </b-col>
-              <b-col md="8" sm="12">
-                <div>Etapa:</div>
-                <b-form-select
-                  ref="etapa"
-                  name="Etapa"
-                  id="etapa"
-                  v-model="obj.stageId"
-                  v-validate="{ required: true }"
-                  @change="chooseResults($event)"
-                >
-                  <option v-for="stage in stages" :value="stage._id" :key="stage._id">{{stage.name}}</option>
-                </b-form-select>
-                <span
-                  v-if="showSpanError('Etapa')"
-                  class="adm-msg-error"
-                >{{ errors.first('Etapa') }}</span>
-
-                <div>Resultados:</div>
-                <b-form-select
-                  ref="resultados"
-                  name="Resultados"
-                  id="resultados"
-                  v-model="obj.stageResultId"
-                  v-validate="{ required: true }"
-                >
-                   <option v-for="result in results" :value="result._id" :key="result._id">{{result.name}}</option>
-               
-                </b-form-select>
-                <span
-                  v-if="showSpanError('Resultados')"
-                  class="adm-msg-error"
-                >{{ errors.first('Resultados') }}</span>
-
-                <b-form-group label="Faça um breve relato da ocorrência *" label-for="divisionName">
-                  <b-form-textarea
-                    rows="3"
-                    max-rows="6"
-                    class="input-text"
-                    ref="occurrence"
-                    name="occurrence"
-                    id="occurrence"
-                    v-model="obj.occurrence"
-                    :readonly="mode === 'remove'"
-                    v-validate="{ required: true, min: 3 }"
-                  ></b-form-textarea>
-                  <span
-                    ref="spnOccurrence"
-                    v-if="showSpanError('Ocorrência')"
-                    class="adm-msg-error"
-                  >{{ errors.first('Ocorrência') }}</span>
-                </b-form-group>
-              </b-col>
-            </b-row>
-          </b-card>
-        </b-card>
+        <b-row>
+          <b-col style="color: green" md="4" sm="12" class="box-ico"></b-col>
+        </b-row>
+        <b-row>
+          <b-col md="6">
+            <b-form-group
+              id="fieldset-etapa"
+              label="Etapa:"
+              label-for="etapa"
+              description="Etapa que você acabou de realizar."
+            >
+              <b-form-select
+                id="etapa"
+                v-model="obj.stageId"
+                v-validate="{ required: true }"
+                @change="chooseResults($event)"
+              >
+                <option v-for="stage in stages" :value="stage._id" :key="stage._id">{{stage.name}}</option>
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+          <b-col md="6">
+            <b-form-group
+              v-if="results.length > 0"
+              id="fieldset-resultado"
+              label="Resultado:"
+              label-for="resultado"
+              description="Informe qual foi o resultado gerado."
+            >
+              <b-form-select
+                id="resultado"
+                v-model="obj.stageResultId"
+                v-validate="{ required: true }"
+              >
+                <option
+                  v-for="result in results"
+                  :value="result._id"
+                  :key="result._id"
+                >{{result.name}}</option>
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            <b-form-group
+              id="fieldset-ocorrencia"
+              label="Ocorrência:"
+              label-for="ocorrência"
+              description="Faça um breve relato da ocorrência"
+            >
+              <b-form-textarea
+                rows="5"
+                max-rows="5"
+                class="input-text"
+                id="ocorrencia"
+                v-model="obj.occurrence"
+                :readonly="mode === 'remove'"
+                v-validate="{ required: true, min: 3 }"
+              ></b-form-textarea>
+            </b-form-group>
+          </b-col>
+        </b-row>
 
         <div class="text-right">
-          <b-button class="btn-main ml-2" v-if="mode === 'save'" @click="save">
-            <i class="fa fa-send fa-lg"></i>
-            Inserir
+          <b-button variant="success" class="ml-2" v-if="mode === 'save'" @click="save">
+            <i class="fa fa-check fa-lg"></i>
+            Registrar Andamento
           </b-button>
           <b-button class="ml-2" variant="secondary" @click="clickModalBtn()">Cancelar</b-button>
         </div>
@@ -121,16 +122,16 @@
       </b-col>
     </b-row>
 
-    <b-card class="mb-2" style="background-color:#ccc; text-align: center">
-      Última etapa registrada:
+    <b-card class="mb-2" style="background-color:#DDD; text-align: center">
+
+      <b-button variant="link" size="small" v-b-toggle.collapse-3 class="m-2"
+      style="color:black">
+      Etapa atual:
       <span
-        style="color: #006799; font-weight:bold"
         v-if="stages[currentStagePosition-1]"
       >{{ stages[currentStagePosition-1].name }}</span>
-
-      <br />
-
-      <b-button variant="primary" size="small" v-b-toggle.collapse-3 class="m-2">Etapas do processo</b-button>
+      (+ detalhes)
+      </b-button>
 
       <b-button
         variant="success"
@@ -138,7 +139,7 @@
         v-b-modal.modal-1
         @click="newStage()"
         class="m-2"
-      >Atualizar Andamento</b-button>
+      >Atualizar o andamento do processo</b-button>
 
       <b-collapse id="collapse-3">
         <div class="mt-2 mb-2">
@@ -177,7 +178,7 @@
       </b-collapse>
     </b-card>
 
-    <div class="layer-total2">Histórico de ocorrências do processo</div>
+    <div class="layer-total">Histórico de ocorrências do processo</div>
 
     <b-table id="my-table" :items="progresses" bordered responsive small :fields="items">
       <template slot="updated_at" slot-scope="row">
@@ -286,21 +287,21 @@ export default {
       // etapas anteriores à corrente
       if (stagePosition < this.currentStagePosition) {
         dynamicOptions.background = "white";
-        dynamicOptions.color = "#0067D9";
+        dynamicOptions.color = "#555";
         dynamicOptions.icon = "fas fa-check-circle fa-2x";
       }
 
       // etapa corrente
       if (stagePosition == this.currentStagePosition) {
-        dynamicOptions.background = "#0068D9";
-        dynamicOptions.color = "white";
+        dynamicOptions.background = "white";
+        dynamicOptions.color = "red";
         dynamicOptions.icon = "fas fa-check-circle fa-2x";
       }
 
       // etapas posteriores à próxima
       if (stagePosition > this.currentStagePosition) {
         dynamicOptions.background = "white";
-        dynamicOptions.color = "#249900";
+        dynamicOptions.color = "#888";
         dynamicOptions.icon = "fas fa-clock fa-2x";
       }
 
@@ -330,6 +331,12 @@ export default {
       let stageName = this.stages[this.currentStagePosition]
         ? this.stages[this.currentStagePosition].name
         : this.stages[0].name;
+
+      let stageResults = this.stages[this.currentStagePosition]
+        ? this.stages[this.currentStagePosition].results
+        : this.stages[0].results;
+
+      this.chooseResults(stageId);
 
       this.obj = {
         processId: this.process._id,
@@ -369,11 +376,11 @@ export default {
         this.stages = res.data;
       });
     },
-    
+
     chooseResults(stage) {
       let st = {};
       st = this.stages.filter(x => x._id === stage);
-      this.results =  st[0].results
+      this.results = st[0].results;
     },
 
     previousStage(stagePreviousId, processStageId) {
@@ -414,6 +421,6 @@ export default {
 }
 .processDetails .arrow {
   margin-top: 21px;
-  color: darkgoldenrod;
+  color: white;
 }
 </style>

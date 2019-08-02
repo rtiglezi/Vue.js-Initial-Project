@@ -15,51 +15,47 @@
     >
       <!-- INICIO FORMULÁRIO DE CADASTRO -->
       <b-form v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
-        <b-card class="mb-3 box-out">
-          <b-card class="box">
-            <b-row>
-              <b-col md="3" sm="12" class="box-ico">
-                <i class="fa fa-building fa-5x" aria-hidden="true"></i>
-                <br />Cadastro de Inquilino
-              </b-col>
-              <b-col md="9" sm="12">
-                <b-form-group label="Apelido do Inquilino *" label-for="tenantAlias">
-                  <b-form-input
-                    class="input-text"
-                    ref="tenantAlias"
-                    name="Apelido"
-                    id="tenantAlias"
-                    v-model="tenant.alias"
-                    :readonly="mode === 'remove'"
-                    v-validate="{ required: true, min: 3 }"
-                  ></b-form-input>
-                  <span
-                    ref="spnApelido"
-                    v-if="showSpanError('Apelido')"
-                    class="adm-msg-error"
-                  >{{ errors.first('Apelido') }}</span>
-                </b-form-group>
+        <b-row>
+          <b-col md="3" sm="12" class="box-ico">
+            <i class="fa fa-building fa-5x" aria-hidden="true"></i>
+            <br />Cadastro de Inquilino
+          </b-col>
+          <b-col md="9" sm="12">
+            <b-form-group label="Apelido do Inquilino *" label-for="tenantAlias">
+              <b-form-input
+                class="input-text"
+                ref="tenantAlias"
+                name="Apelido"
+                id="tenantAlias"
+                v-model="tenant.alias"
+                :readonly="mode === 'remove'"
+                v-validate="{ required: true, min: 3 }"
+              ></b-form-input>
+              <span
+                ref="spnApelido"
+                v-if="showSpanError('Apelido')"
+                class="adm-msg-error"
+              >{{ errors.first('Apelido') }}</span>
+            </b-form-group>
 
-                <b-form-group label="Nome do Inquilino *" label-for="tenantName">
-                  <b-form-input
-                    class="input-text"
-                    ref="tenantName"
-                    name="Nome"
-                    id="tenantName"
-                    v-model="tenant.name"
-                    :readonly="mode === 'remove'"
-                    v-validate="{ required: true, min: 3 }"
-                  ></b-form-input>
-                  <span
-                    ref="spnNome"
-                    v-if="showSpanError('Nome')"
-                    class="adm-msg-error"
-                  >{{ errors.first('Nome') }}</span>
-                </b-form-group>
-              </b-col>
-            </b-row>
-          </b-card>
-        </b-card>
+            <b-form-group label="Nome do Inquilino *" label-for="tenantName">
+              <b-form-input
+                class="input-text"
+                ref="tenantName"
+                name="Nome"
+                id="tenantName"
+                v-model="tenant.name"
+                :readonly="mode === 'remove'"
+                v-validate="{ required: true, min: 3 }"
+              ></b-form-input>
+              <span
+                ref="spnNome"
+                v-if="showSpanError('Nome')"
+                class="adm-msg-error"
+              >{{ errors.first('Nome') }}</span>
+            </b-form-group>
+          </b-col>
+        </b-row>
 
         <div class="text-right">
           <b-button class="btn-main ml-2" v-if="mode === 'save'" @click="save">

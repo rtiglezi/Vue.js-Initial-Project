@@ -15,34 +15,30 @@
     >
       <!-- INICIO FORMULÁRIO DE CADASTRO -->
       <b-form v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
-        <b-card class="mb-3 box-out">
-          <b-card class="box">
-            <b-row>
-              <b-col md="3" sm="12" class="box-ico">
-                <i class="fa fa-tasks fa-5x" aria-hidden="true"></i>
-                <br />Cadastro de Demanda
-              </b-col>
-              <b-col md="9" sm="12">
-                <b-form-group label="Nome da Demanda *" label-for="demandName">
-                  <b-form-input
-                    class="input-text"
-                    ref="demandName"
-                    name="Nome"
-                    id="demandName"
-                    v-model="demand.name"
-                    :readonly="mode === 'remove'"
-                    v-validate="{ required: true, min: 3 }"
-                  ></b-form-input>
-                  <span
-                    ref="spnNome"
-                    v-if="showSpanError('Nome')"
-                    class="adm-msg-error"
-                  >{{ errors.first('Nome') }}</span>
-                </b-form-group>
-              </b-col>
-            </b-row>
-          </b-card>
-        </b-card>
+        <b-row>
+          <b-col md="3" sm="12" class="box-ico">
+            <i class="fa fa-tasks fa-5x" aria-hidden="true"></i>
+            <br />Cadastro de Demanda
+          </b-col>
+          <b-col md="9" sm="12">
+            <b-form-group label="Nome da Demanda *" label-for="demandName">
+              <b-form-input
+                class="input-text"
+                ref="demandName"
+                name="Nome"
+                id="demandName"
+                v-model="demand.name"
+                :readonly="mode === 'remove'"
+                v-validate="{ required: true, min: 3 }"
+              ></b-form-input>
+              <span
+                ref="spnNome"
+                v-if="showSpanError('Nome')"
+                class="adm-msg-error"
+              >{{ errors.first('Nome') }}</span>
+            </b-form-group>
+          </b-col>
+        </b-row>
 
         <div class="text-right">
           <b-button class="btn-main ml-2" v-if="mode === 'save'" @click="save">
@@ -288,8 +284,8 @@ export default {
       }
     },
     goToStages(demand) {
-        this.$router.push({ name: "stageAdmin", params: { demand } });
-    },
+      this.$router.push({ name: "stageAdmin", params: { demand } });
+    }
   },
   mounted() {
     if (!this.mode) {

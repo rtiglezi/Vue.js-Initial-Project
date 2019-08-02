@@ -15,34 +15,30 @@
     >
       <!-- INICIO FORMULÁRIO DE CADASTRO -->
       <b-form v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
-        <b-card class="mb-3 box-out">
-          <b-card class="box">
-            <b-row>
-              <b-col md="3" sm="12" class="box-ico">
-                <i class="fa fa-sitemap fa-5x" aria-hidden="true"></i>
-                <br />Cadastro de Unidade
-              </b-col>
-              <b-col md="9" sm="12">
-                <b-form-group label="Nome da Unidade *" label-for="divisionName">
-                  <b-form-input
-                    class="input-text"
-                    ref="divisionName"
-                    name="Nome"
-                    id="divisionName"
-                    v-model="division.name"
-                    :readonly="mode === 'remove'"
-                    v-validate="{ required: true, min: 3 }"
-                  ></b-form-input>
-                  <span
-                    ref="spnNome"
-                    v-if="showSpanError('Nome')"
-                    class="adm-msg-error"
-                  >{{ errors.first('Nome') }}</span>
-                </b-form-group>
-              </b-col>
-            </b-row>
-          </b-card>
-        </b-card>
+        <b-row>
+          <b-col md="3" sm="12" class="box-ico">
+            <i class="fa fa-sitemap fa-5x" aria-hidden="true"></i>
+            <br />Cadastro de Unidade
+          </b-col>
+          <b-col md="9" sm="12">
+            <b-form-group label="Nome da Unidade *" label-for="divisionName">
+              <b-form-input
+                class="input-text"
+                ref="divisionName"
+                name="Nome"
+                id="divisionName"
+                v-model="division.name"
+                :readonly="mode === 'remove'"
+                v-validate="{ required: true, min: 3 }"
+              ></b-form-input>
+              <span
+                ref="spnNome"
+                v-if="showSpanError('Nome')"
+                class="adm-msg-error"
+              >{{ errors.first('Nome') }}</span>
+            </b-form-group>
+          </b-col>
+        </b-row>
 
         <div class="text-right">
           <b-button class="btn-main ml-2" v-if="mode === 'save'" @click="save">

@@ -18,131 +18,127 @@
         <b-row>
           <b-col md="12" sm="12">
             <b-card class="mb-2 box-out">
-              <b-card class="box">
-                <b-row>
-                  <b-col md="3" sm="12" class="box-ico">
-                    <i class="fa fa-users fa-5x" aria-hidden="true"></i>
-                    <br />Dados Cadastrais
-                  </b-col>
-                  <b-col md="9" sm="12">
-                    <b-form-group label="Nome *" label-for="userName">
-                      <b-form-input
-                        ref="userName"
-                        name="Nome"
-                        id="userName"
-                        class="input-text"
-                        v-model="user.name"
-                        :readonly="mode === 'remove'"
-                        v-validate="{ required: true, min: 3 }"
-                      ></b-form-input>
-                      <span
-                        ref="spnNome"
-                        v-if="showSpanError('Nome')"
-                        class="adm-msg-error"
-                      >{{ errors.first('Nome') }}</span>
-                    </b-form-group>
+              <b-row>
+                <b-col md="3" sm="12" class="box-ico">
+                  <i class="fa fa-users fa-5x" aria-hidden="true"></i>
+                  <br />Dados Cadastrais
+                </b-col>
+                <b-col md="9" sm="12">
+                  <b-form-group label="Nome *" label-for="userName">
+                    <b-form-input
+                      ref="userName"
+                      name="Nome"
+                      id="userName"
+                      class="input-text"
+                      v-model="user.name"
+                      :readonly="mode === 'remove'"
+                      v-validate="{ required: true, min: 3 }"
+                    ></b-form-input>
+                    <span
+                      ref="spnNome"
+                      v-if="showSpanError('Nome')"
+                      class="adm-msg-error"
+                    >{{ errors.first('Nome') }}</span>
+                  </b-form-group>
 
-                    <b-form-group label="E-mail *" label-for="user-email">
-                      <b-form-input
-                        class="input-text"
-                        prepend="@"
-                        name="E-mail"
-                        id="user-email"
-                        v-model="user.email"
-                        :readonly="mode === 'remove'"
-                        v-validate="'required|email'"
-                      ></b-form-input>
-                      <span
-                        v-if="showSpanError('E-mail')"
-                        class="adm-msg-error"
-                      >{{ errors.first('E-mail') }}</span>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
-              </b-card>
+                  <b-form-group label="E-mail *" label-for="user-email">
+                    <b-form-input
+                      class="input-text"
+                      prepend="@"
+                      name="E-mail"
+                      id="user-email"
+                      v-model="user.email"
+                      :readonly="mode === 'remove'"
+                      v-validate="'required|email'"
+                    ></b-form-input>
+                    <span
+                      v-if="showSpanError('E-mail')"
+                      class="adm-msg-error"
+                    >{{ errors.first('E-mail') }}</span>
+                  </b-form-group>
+                </b-col>
+              </b-row>
             </b-card>
           </b-col>
           <b-col md="12" sm="12">
             <b-card class="mb-3 box-out">
-              <b-card class="box">
-                <b-row>
-                  <b-col md="3" sm="12" class="box-ico">
-                    <i class="fas fa-key fa-5x" aria-hidden="true"></i>
-                    <br />Permissões
-                  </b-col>
+              <b-row>
+                <b-col md="3" sm="12" class="box-ico">
+                  <i class="fas fa-key fa-5x" aria-hidden="true"></i>
+                  <br />Permissões
+                </b-col>
 
-                  <b-col md="8" sm="12">
-                    <b-row>
-                      <b-col>
-                        <div>Pertencente ao inquilino:</div>
-                        <b-form-select
+                <b-col md="8" sm="12">
+                  <b-row>
+                    <b-col>
+                      <div>Pertencente ao inquilino:</div>
+                      <b-form-select
                         ref="inquilino"
                         name="Inquilino"
                         id="inquilino"
-                          :disabled="mode === 'remove'"
-                          v-model="user.tenant"
-                          @change="loadDivisions($event)"
-                           v-validate="{ required: true }"
-                        >
-                          <option
-                            v-for="tenant in tenants"
-                            :value="tenant._id"
-                            :key="tenant._id"
-                          >{{tenant.alias}}</option>
-                        </b-form-select>
-                         <span
+                        :disabled="mode === 'remove'"
+                        v-model="user.tenant"
+                        @change="loadDivisions($event)"
+                        v-validate="{ required: true }"
+                      >
+                        <option
+                          v-for="tenant in tenants"
+                          :value="tenant._id"
+                          :key="tenant._id"
+                        >{{tenant.alias}}</option>
+                      </b-form-select>
+                      <span
                         v-if="showSpanError('Inquilino')"
                         class="adm-msg-error"
                       >{{ errors.first('Inquilino') }}</span>
-                      </b-col>
-                    </b-row>
-                    <hr />
-                    <b-row>
-                      <b-col>
-                        <b-form-group
-                          label="Tem acesso à(s) unidade(s):"
-                          label-for="user-allowedDivisions"
+                    </b-col>
+                  </b-row>
+                  <hr />
+                  <b-row>
+                    <b-col>
+                      <b-form-group
+                        label="Tem acesso à(s) unidade(s):"
+                        label-for="user-allowedDivisions"
+                      >
+                        <b-form-checkbox-group
+                          stacked
+                          id="user-allowedDivisions"
+                          v-model="user.allowedDivisions"
+                          name="divisions"
                         >
-                          <b-form-checkbox-group
-                            stacked
-                            id="user-allowedDivisions"
-                            v-model="user.allowedDivisions"
-                            name="divisions"
-                          >
-                            <b-form-checkbox
-                              :disabled="mode === 'remove'"
-                              v-for="division in divisions"
-                              :key="division._id"
-                              :value="division._id"
-                            >{{ division.name }}</b-form-checkbox>
-                          </b-form-checkbox-group>
-                        </b-form-group>
-                      </b-col>
-                    </b-row>
-                    <hr />
-                    <b-row>
-                      <b-col>
-                        <b-form-group label="Perfil de acesso:" label-for="user-profiles">
-                          <b-form-checkbox-group
-                            stacked
-                            id="user-profiles"
-                            v-model="user.profiles"
-                            name="profiles"
-                          >
-                            <b-form-checkbox disabled value="user">user</b-form-checkbox>
-                            <b-form-checkbox
-                             :disabled="mode === 'remove'"
-                              v-for="profile in profiles"
-                              :key="profile.name"
-                              :value="profile.name"
-                            >{{ profile.name }}</b-form-checkbox>
-                          </b-form-checkbox-group>
-                        </b-form-group>
-                      </b-col>
-                    </b-row>
-                  </b-col>
-                </b-row>
-              </b-card>
+                          <b-form-checkbox
+                            :disabled="mode === 'remove'"
+                            v-for="division in divisions"
+                            :key="division._id"
+                            :value="division._id"
+                          >{{ division.name }}</b-form-checkbox>
+                        </b-form-checkbox-group>
+                      </b-form-group>
+                    </b-col>
+                  </b-row>
+                  <hr />
+                  <b-row>
+                    <b-col>
+                      <b-form-group label="Perfil de acesso:" label-for="user-profiles">
+                        <b-form-checkbox-group
+                          stacked
+                          id="user-profiles"
+                          v-model="user.profiles"
+                          name="profiles"
+                        >
+                          <b-form-checkbox disabled value="user">user</b-form-checkbox>
+                          <b-form-checkbox
+                            :disabled="mode === 'remove'"
+                            v-for="profile in profiles"
+                            :key="profile.name"
+                            :value="profile.name"
+                          >{{ profile.name }}</b-form-checkbox>
+                        </b-form-checkbox-group>
+                      </b-form-group>
+                    </b-col>
+                  </b-row>
+                </b-col>
+              </b-row>
             </b-card>
           </b-col>
         </b-row>

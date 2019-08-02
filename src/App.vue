@@ -125,7 +125,7 @@ body {
 }
 
 .table-th2 {
-  background-color: #8fdfa0;
+  background-color: #DFF0D8;
   color: #333;
   font-weight: 100;
 }
@@ -140,13 +140,6 @@ body {
   color: white;
 }
 
-.layer-total2 {
-  background-color: #249900;
-  color: #333;
-  text-align: center;
-  font-weight: 100;
-  color: white;
-}
 
 
 .input-text {
