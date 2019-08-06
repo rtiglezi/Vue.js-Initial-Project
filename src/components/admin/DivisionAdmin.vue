@@ -1,10 +1,6 @@
 <template>
   <div class="division-admin">
-    <PageTitle
-      icon="fa fa-sitemap"
-      main="Cadastro de Unidades"
-      sub="Área administrativa de acesso restrito"
-    />
+    <PageTitle main="divisions" />
 
     <b-modal
       size="lg"
@@ -61,18 +57,39 @@
 
     <!-- INÍCIO DA LISTA -->
     <div>
-      <b-row class="mb-2">
-        <b-col>
-          <b-input-group>
-            <b-form-input small ref="txtFilter" v-model="filter" placeholder="Busca rápida ..."></b-form-input>
-            <b-input-group-append>
-              <b-button :disabled="!filter" @click="filter = ''">Limpar</b-button>
-            </b-input-group-append>
-          </b-input-group>
+      <b-row>
+        <b-col md="4">
+          <div style="text-align:left">
+            <b-button
+              class="mb-2 mr-2"
+              variant="outline-secondary"
+              size="sm"
+              v-b-modal="'mymodal'"
+              @click="clearForm"
+            >
+              <i class="fas fa-plus"></i> Adicionar
+            </b-button>
+            <b-button
+              class="mb-2 mr-2"
+              variant="outline-secondary"
+              size="sm"
+              v-b-modal="'mymodal'"
+              @click="clearForm"
+            >
+              <i class="fas fa-search"></i> Pesquisar
+            </b-button>
+          </div>
         </b-col>
+       <b-col md="4">
+         <div class="titulo">
+          Cadastro de Unidades
+          </div>
+        </b-col>
+        <b-col md="4"></b-col>
       </b-row>
 
-      <div class="layer-total">Total de {{ totalRows }} registro(s)</div>
+      <div class="layer-total"><i class="fas fa-sitemap mr-2"></i>{{ totalRows }} registro(s)</div>
+
 
       <b-table
         id="my-table"
@@ -114,11 +131,6 @@
     </div>
 
     <b-row>
-      <b-col>
-        <b-button v-b-modal="'mymodal'" @click="clearForm">
-          <i class="fas fa-plus"></i> Adicionar
-        </b-button>
-      </b-col>
       <b-col>
         <b-pagination
           small

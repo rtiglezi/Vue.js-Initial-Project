@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <PageTitle icon="fa fa-home" main="Dashboard" sub="Consolidação dos dados" />
+    <PageTitle main="home" />
 
     <div v-for="demand in demands" :key="demand._id" class="mb-2">
       <b-card style="background-color: #eee">

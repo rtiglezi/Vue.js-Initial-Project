@@ -1,5 +1,9 @@
 <template>
   <div class="tenant-admin">
+
+     <PageTitle
+      main="processes"
+    />
     
     <b-modal
       size="lg"
@@ -17,7 +21,7 @@
               <b-card class="box">
                 <b-row>
                   <b-col md="3" sm="12" class="box-ico">
-                    <i class="fa fa-folder-open fa-5x" aria-hidden="true"></i>
+                    <i class="fa fa-th-list fa-5x" aria-hidden="true"></i>
                     <br />Dados Cadastrais
                   </b-col>
                   <b-col md="9" sm="12">
@@ -254,19 +258,37 @@
 
     <!-- INÍCIO DA LISTA -->
     <div>
-      <b-row class="mb-2">
-        <b-col></b-col>
-        <b-col>
-          <b-input-group>
-            <b-form-input small ref="txtFilter" v-model="filter" placeholder="Busca rápida ..."></b-form-input>
-            <b-input-group-append>
-              <b-button :disabled="!filter" @click="filter = ''">Limpar</b-button>
-            </b-input-group-append>
-          </b-input-group>
+      <b-row>
+        <b-col md="4">
+          <div style="text-align:left">
+            <b-button
+              class="mb-2 mr-2"
+              variant="outline-secondary"
+              size="sm"
+              v-b-modal="'mymodal'"
+            >
+              <i class="fas fa-plus"></i> Adicionar
+            </b-button>
+            <b-button
+              class="mb-2 mr-2"
+              variant="outline-secondary"
+              size="sm"
+              v-b-modal="'mymodal'"
+            >
+              <i class="fas fa-search"></i> Pesquisar
+            </b-button>
+          </div>
         </b-col>
+       <b-col md="4">
+         <div class="titulo">
+          Cadastro de Processos
+          </div>
+        </b-col>
+        <b-col md="4"></b-col>
       </b-row>
 
-      <div class="layer-total">Total de {{ totalRows }} registro(s)</div>
+      <div class="layer-total"><i class="fab fa-buffer mr-2"></i>{{ totalRows }} registro(s)</div>
+
 
       <b-table
         id="my-table"
@@ -302,7 +324,7 @@
 
         <template slot="number" slot-scope="row">
           <a
-            style="color:#006999; font-weight: bold"
+            style="color:#006999"
             href="#"
             v-b-modal="'mymodal'"
             @click.prevent="goToProcess(row.item)"
@@ -334,11 +356,6 @@
     </div>
 
     <b-row>
-      <b-col>
-        <b-button v-b-modal="'mymodal'" @click="firstForm">
-          <i class="fas fa-plus"></i> Adicionar
-        </b-button>
-      </b-col>
       <b-col>
         <b-pagination
           small
@@ -450,7 +467,7 @@ export default {
         },
         {
            key: "progresses",
-           label: "Andamentos",
+           label: "Última etapa",
            sortable: true,
            class: "text-center",
            thClass: "table-th",

@@ -1,65 +1,35 @@
 <template>
   <div class="header">
     <b-navbar toggleable="lg" type="dark" class="header-nav" v-if="user">
-      <b-navbar-brand href="#" class="header-title" @click="navigate('/')">
+      <b-navbar-brand href="#" class="header-title">
         <img src="@/assets/c-proc.png" alt="Logo" width="30" />ceproc
       </b-navbar-brand>
-      <span class="mr-3 client">[{{ user.tenantAlias }}]</span>
+
+      <span class="client">[{{ user.tenantAlias }}]</span>
+
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
-        <b-navbar-nav v-if="user.profiles.indexOf('master')!=-1">
-          <b-nav-item-dropdown text="Configuração">
-            <template slot="button-content">
-              <i class="fas fa-meteor"></i>
-              Criação
-            </template>
-            <b-dropdown-item href="#" @click="navigate('/admin/tenants')">
-              <i class="fa fa-building mr-1 admin-icon"></i>Inquilinos
-            </b-dropdown-item>
-          </b-nav-item-dropdown>
-        </b-navbar-nav>
-
-
-<b-navbar-nav v-if="user.profiles.indexOf('admin')!=-1">
-          <b-nav-item-dropdown text="Processos">
-            <template slot="button-content">
-              <i class="fa fa-folder-open"></i>
-              Processos
-            </template>
-            <b-dropdown-item href="#" @click="navigate('/processes')">
-              <i class="fa fa-th-list mr-1 admin-icon"></i>Listar
-            </b-dropdown-item>
-          </b-nav-item-dropdown>
-        </b-navbar-nav>
-
-
-        <b-navbar-nav v-if="user.profiles.indexOf('admin')!=-1">
-          <b-nav-item-dropdown text="Administração">
-            <template slot="button-content">
-              <i class="fa fa-user-cog"></i>
-              Administração
-            </template>
-            <b-dropdown-item href="#" @click="navigate('/admin/users')">
-              <i class="fa fa-users mr-1 admin-icon"></i>Usuários
-            </b-dropdown-item>
-            <b-dropdown-item href="#" @click="navigate('/admin/divisions')">
-              <i class="fa fa-sitemap mr-1 admin-icon"></i>Unidades
-            </b-dropdown-item>
-            <b-dropdown-item href="#" @click="navigate('/admin/demands')">
-              <i class="fas fa-tasks mr-1 admin-icon"></i>Demandas
-            </b-dropdown-item>
-          </b-nav-item-dropdown>
-        </b-navbar-nav>
-
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
-          <!--
           <b-nav-form class="mr-5">
-            <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
-            <b-button variant="dark" size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+            <span style="color: white; margin-right: 2px;">Pesquisar:</span>
+            <b-form-input size="sm" class="mr-sm-2" placeholder="número processo..."></b-form-input>
+
+            <b-form-select size="sm" @change="changeDivision($event)">
+              <option
+                v-for="division in divisions"
+                :value="division._id"
+                :key="division._id"
+              >{{division.name}}</option>
+            </b-form-select>
+
+            <i
+              @click="navigate('/processes')"
+              class="fab fa-buffer fa-2x ml-2"
+              style="color:white; cursor:pointer"
+            ></i>
           </b-nav-form>
-          -->
 
           <b-nav-item-dropdown right>
             <!-- Using 'button-content' slot -->
@@ -81,23 +51,42 @@
 </template>
 
 <script>
-
 import { userKey } from "@/global";
 import { mapState } from "vuex";
+
+import { baseApiUrl } from "@/global";
+import axios from "axios";
 
 export default {
   name: "Header",
   computed: mapState(["user"]),
   props: {
-    title: String,
+    title: String
   },
-  data: function(){
+  data: function() {
     return {
-    }
+      divisions: []
+    };
   },
   methods: {
     navigate(link) {
       this.$router.push(link);
+    },
+    loadDivisions() {
+      const url = `${baseApiUrl}/divisions`;
+      axios.get(url).then(res => {
+        this.divisions = res.data;
+      });
+    },
+    changeDivision(division) {
+      let userObj = {
+        lastDivision: division
+      }
+      const url = `${baseApiUrl}/users/${this.user._id}/changedivision`;
+      axios.patch(url, userObj).then(usr => {
+        alert('Unidade alterada!')
+        this.navigate('/processes')
+      });
     },
     logout() {
       localStorage.removeItem(userKey);
@@ -105,7 +94,8 @@ export default {
       this.$router.push({ name: "auth" });
     }
   },
-  mounted(){
+  mounted() {
+    this.loadDivisions();
   }
 };
 </script>
@@ -125,7 +115,8 @@ export default {
   color: #c8a741;
 }
 .header .client {
-  color: #C8A741;
+  text-align: center;
+  color: white;
   font-weight: bold;
 }
 </style>

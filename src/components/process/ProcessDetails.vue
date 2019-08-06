@@ -1,5 +1,8 @@
 <template>
   <div class="processDetails">
+   
+    <PageTitle main="processes" />
+
     <b-modal
       v-model="modalShow"
       size="lg"
@@ -7,7 +10,6 @@
       id="modal-1"
       style="color: green; font-weight: bold"
       title="Registro de andamento no processo"
-      
     >
       <!-- INICIO FORMULÁRIO DE CADASTRO -->
       <b-form v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
@@ -18,7 +20,7 @@
           <b-col md="6">
             <b-form-group
               id="fieldset-etapa"
-              label="Etapa:"
+              label="Etapa a ser registrada:"
               label-for="etapa"
               description="Etapa que você acabou de realizar."
             >
@@ -36,7 +38,7 @@
             <b-form-group
               v-if="results.length > 0"
               id="fieldset-resultado"
-              label="Resultado:"
+              label="Resultado gerado:"
               label-for="resultado"
               description="Informe qual foi o resultado gerado."
             >
@@ -123,14 +125,12 @@
     </b-row>
 
     <b-card class="mb-2" style="background-color:#DDD; text-align: center">
-
-      <b-button variant="link" size="small" v-b-toggle.collapse-3 class="m-2"
-      style="color:black">
-      Etapa atual:
-      <span
-        v-if="stages[currentStagePosition-1]"
-      >{{ stages[currentStagePosition-1].name }}</span>
-      (+ detalhes)
+      <b-button variant="link" size="small" v-b-toggle.collapse-3 class="m-2" style="color:black">
+        Última etapa:
+        <span
+          v-if="stages[currentStagePosition-1]"
+        >{{ stages[currentStagePosition-1].name }}</span>
+        (+ detalhes)
       </b-button>
 
       <b-button

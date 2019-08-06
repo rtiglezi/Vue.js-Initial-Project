@@ -146,5 +146,11 @@ body {
   border: 1px solid #ccc;
 }
 
+.titulo {
+text-align:center; 
+color: #555; 
+font-weight:bold
+}
+
 </style>
 
