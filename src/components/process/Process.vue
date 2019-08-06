@@ -8,6 +8,7 @@
       v-model="modalShow"
       title="Cadastro de Processo"
     >
+   
       <!-- INICIO FORMULÁRIO DE CADASTRO -->
       <b-form v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
         <b-row>
@@ -291,11 +292,13 @@
           </div>
         </template>
 
-        <!-- <template slot="arrayStages" slot-scope="row">
-          <div v-for="(item,index) in row.item.arrayStages" :key="item._id" :index="index">
-            <div style="color:brown" v-if="item._id === row.item.stageId">{{ item.name}}</div>
-          </div>
-        </template> -->
+       <template slot="progresses" slot-scope="row">
+         <div v-for="(item, index) in row.item.progresses" :index="index" :key="item._id">
+            <div style="color: brown" v-if="index == row.item.progresses.length-1">
+              {{ getStageName(item.demand, item.stage) }}
+            </div>
+         </div>
+        </template>
 
         <template slot="number" slot-scope="row">
           <a
@@ -371,6 +374,7 @@ export default {
       mode: "save",
       divisions: [],
       demands: [],
+      stages: [],
       users: [],
       requester: [],
       process: {
@@ -444,14 +448,14 @@ export default {
           thClass: "table-th",
           tdClass: "table-td"
         },
-        // {
-        //   key: "arrayStages",
-        //   label: "Última Etapa",
-        //   sortable: true,
-        //   class: "text-center",
-        //   thClass: "table-th",
-        //   tdClass: "table-td"
-        // },
+        {
+           key: "progresses",
+           label: "Andamentos",
+           sortable: true,
+           class: "text-center",
+           thClass: "table-th",
+           tdClass: "table-td"
+         },
         {
           key: "atribuicao",
           label: "Atribuição",
@@ -501,6 +505,19 @@ export default {
       axios.get(url).then(res => {
         this.process = res.data;
       });
+    },
+    getStageName(demand, stage) {
+      let stageName = ""
+      this.demands.map(d=>{
+        if (d._id == demand){
+          d.stages.map(s=>{
+            if (s._id == stage) {
+              stageName = s.name
+            }
+          })
+        }
+      })
+      return stageName
     },
     save() {
       const method = this.process._id ? "patch" : "post";
