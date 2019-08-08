@@ -9,6 +9,7 @@ import DemandAdmin from "@/components/admin/DemandAdmin";
 import StageAdmin from "@/components/admin/StageAdmin";
 import ProcessList from "@/components/process/Process";
 import ProcessDetails from "@/components/process/ProcessDetails";
+import AfterDivisionChange from "@/components/redirection/afterDivisionChange";
 
 
 import Auth from "@/components/auth/Auth";
@@ -64,6 +65,12 @@ const routes = [
     name: "processDetails",
     path: "/processes/details",
     component: ProcessDetails,
+    meta: { requiresAdmin: false }
+  },
+  {
+    name: "afterDivisionChange",
+    path: "/redirection/division",
+    component: AfterDivisionChange,
     meta: { requiresAdmin: false }
   }
 ];

@@ -1,10 +1,9 @@
 <template>
   <div class="tenant-admin">
+    <Header title="[e-Proc 2]" />
 
-     <PageTitle
-      main="processes"
-    />
-    
+    <PageTitle main="processes" />
+
     <b-modal
       size="lg"
       v-bind:hide-footer="true"
@@ -12,7 +11,6 @@
       v-model="modalShow"
       title="Cadastro de Processo"
     >
-   
       <!-- INICIO FORMULÁRIO DE CADASTRO -->
       <b-form v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
         <b-row>
@@ -234,7 +232,7 @@
             v-if="mode === 'save'"
             @click="save"
           >
-            <i class="fa fa-send fa-lg"></i>
+            <i class="fa fa-send "></i>
             Inserir
           </b-button>
           <b-button
@@ -243,11 +241,11 @@
             v-if="mode === 'edit'"
             @click="save"
           >
-            <i class="fas fa-save fa-lg"></i>
+            <i class="fas fa-save "></i>
             Salvar Edição
           </b-button>
           <b-button variant="danger" class="ml-2" v-if="mode === 'remove'" @click="remove">
-            <i class="far fa-trash-alt fa-lg"></i>
+            <i class="far fa-trash-alt "></i>
             Excluir?
           </b-button>
           <b-button class="ml-2" variant="secondary" @click="clickModalBtn()">Cancelar</b-button>
@@ -259,36 +257,60 @@
     <!-- INÍCIO DA LISTA -->
     <div>
       <b-row>
-        <b-col md="4">
+        <b-col>
           <div style="text-align:left">
-            <b-button
-              class="mb-2 mr-2"
-              variant="outline-secondary"
-              size="sm"
-              v-b-modal="'mymodal'"
-            >
-              <i class="fas fa-plus"></i> Adicionar
+            <b-button size="sm" variant="outline-success" class="mr-2" v-b-modal="'mymodal'">
+              <i class="fas fa-plus"></i>
+              Adicionar
             </b-button>
+            <b-button size="sm" variant="outline-info" class="mr-2" v-b-modal="'mymodal'">
+              <i class="fas fa-search"></i>
+              Pesquisar
+            </b-button>
+
             <b-button
-              class="mb-2 mr-2"
-              variant="outline-secondary"
               size="sm"
+              variant="secondary"
+              v-if="selectedProcesses.length"
+              class="mr-2"
               v-b-modal="'mymodal'"
             >
-              <i class="fas fa-search"></i> Pesquisar
+              <i class="fas fa-share"></i>
+              <i class="fas fa-user-check "></i>
+              Atribuir
+            </b-button>
+
+            <b-button
+              size="sm"
+              variant="secondary"
+              v-if="selectedProcesses.length"
+              class="mr-2"
+              v-b-modal="'mymodal'"
+            >
+              <i class="fas fa-share"></i>
+              <i class="fas fa-sitemap "></i>
+              Tramitar
+            </b-button>
+
+            <b-button
+              size="sm"
+              variant="danger"
+              @click="selectedProcesses=[]"
+              v-if="selectedProcesses.length"
+              class="mr-2"
+            >
+              <i class="fas fa-times  mr-1"></i>
+
+              Limpar seleção de {{ (selectedProcesses.length) ? selectedProcesses.length : '0' }} processo(s)
             </b-button>
           </div>
         </b-col>
-       <b-col md="4">
-         <div class="titulo">
-          Cadastro de Processos
-          </div>
-        </b-col>
-        <b-col md="4"></b-col>
       </b-row>
 
-      <div class="layer-total"><i class="fab fa-buffer mr-2"></i>{{ totalRows }} registro(s)</div>
-
+      <div class="layer-total mt-2">
+        <i class="fab fa-buffer mr-2"></i>
+        Cadastro de Processos - {{ totalRows }} registro(s)
+      </div>
 
       <b-table
         id="my-table"
@@ -298,9 +320,7 @@
         bordered
         responsive
         small
-        :filter="filter"
         :fields="items"
-        @filtered="onFiltered"
       >
         <template slot="updated_at" slot-scope="row">
           <div style="color:#888">
@@ -314,12 +334,32 @@
           </div>
         </template>
 
-       <template slot="progresses" slot-scope="row">
-         <div v-for="(item, index) in row.item.progresses" :index="index" :key="item._id">
-            <div style="color: brown" v-if="index == row.item.progresses.length-1">
-              {{ getStageName(item.demand, item.stage) }}
-            </div>
-         </div>
+        <template slot="progresses" slot-scope="row">
+          <div v-for="(item, index) in row.item.progresses" :index="index" :key="item._id">
+            <div
+              style="color: brown"
+              v-if="index == row.item.progresses.length-1"
+            >{{ getStageName(item.demand, item.stage) }}</div>
+          </div>
+        </template>
+
+        <template slot="HEAD_checks" slot-scope="row">
+          <a
+            style="width:30px; cursor:pointer"
+            variant="link"
+            size="sm"
+            :name="row.item"
+            @click="toggleSelect()"
+          >
+            <i v-if="selectedProcesses.length" class="fas fa-times" style="color:red"></i>
+            <i v-else class="fas fa-check" style="color:blue"></i>
+          </a>
+        </template>
+
+        <template slot="checks" slot-scope="row">
+          <b-form-checkbox-group stacked v-model="selectedProcesses" name="checks">
+            <b-form-checkbox size="sm" :key="row.item._id" :value="row.item._id"></b-form-checkbox>
+          </b-form-checkbox-group>
         </template>
 
         <template slot="number" slot-scope="row">
@@ -385,6 +425,7 @@ export default {
   components: { PageTitle },
   data: function() {
     return {
+      selectedProcesses: [],
       loading: false,
       modalShow: false,
       btnCancelDisabled: false,
@@ -408,10 +449,18 @@ export default {
       options: [],
       items: [
         {
+          key: "checks",
+          label: "",
+          sortable: false,
+          class: "text-center",
+          thClass: "table-th",
+          tdClass: "table-td"
+        },
+        {
           key: "updated_at",
           label: "Atualizado",
           sortable: true,
-          class: "text-center",
+          class: "text-left",
           thClass: "table-th",
           tdClass: "table-td"
         },
@@ -419,7 +468,7 @@ export default {
           key: "divisionName",
           label: "Unidade:",
           sortable: true,
-          class: "text-center",
+          class: "text-left",
           thClass: "table-th",
           tdClass: "table-td"
         },
@@ -427,7 +476,7 @@ export default {
           key: "number",
           label: "Processo",
           sortable: true,
-          class: "text-center",
+          class: "text-left",
           thClass: "table-th",
           tdClass: "table-td"
         },
@@ -436,7 +485,7 @@ export default {
           key: "demandName",
           label: "Demanda",
           sortable: true,
-          class: "text-center",
+          class: "text-left",
           thClass: "table-th",
           tdClass: "table-td"
         },
@@ -445,7 +494,7 @@ export default {
           key: "requesterName",
           label: "Solicitante",
           sortable: true,
-          class: "text-center",
+          class: "text-left",
           thClass: "table-th",
           tdClass: "table-td"
         },
@@ -453,7 +502,7 @@ export default {
           key: "city",
           label: "Cidade",
           sortable: true,
-          class: "text-center",
+          class: "text-left",
           thClass: "table-th",
           tdClass: "table-td"
         },
@@ -461,23 +510,23 @@ export default {
           key: "state",
           label: "UF",
           sortable: true,
-          class: "text-center",
+          class: "text-left",
           thClass: "table-th",
           tdClass: "table-td"
         },
         {
-           key: "progresses",
-           label: "Última etapa",
-           sortable: true,
-           class: "text-center",
-           thClass: "table-th",
-           tdClass: "table-td"
-         },
+          key: "progresses",
+          label: "Última etapa",
+          sortable: true,
+          class: "text-left",
+          thClass: "table-th",
+          tdClass: "table-td"
+        },
         {
           key: "atribuicao",
           label: "Atribuição",
           sortable: true,
-          class: "text-center",
+          class: "text-left",
           thClass: "table-th",
           tdClass: "table-td"
         },
@@ -485,7 +534,7 @@ export default {
           key: "actions",
           label: "Ações",
           sortable: false,
-          class: "text-center",
+          class: "text-left",
           thClass: "table-th",
           tdClass: "table-td"
         }
@@ -524,17 +573,17 @@ export default {
       });
     },
     getStageName(demand, stage) {
-      let stageName = ""
-      this.demands.map(d=>{
-        if (d._id == demand){
-          d.stages.map(s=>{
+      let stageName = "";
+      this.demands.map(d => {
+        if (d._id == demand) {
+          d.stages.map(s => {
             if (s._id == stage) {
-              stageName = s.name
+              stageName = s.name;
             }
-          })
+          });
         }
-      })
-      return stageName
+      });
+      return stageName;
     },
     save() {
       const method = this.process._id ? "patch" : "post";
@@ -568,11 +617,6 @@ export default {
       } else {
         return true;
       }
-    },
-    onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
-      this.totalRows = filteredItems.length;
-      this.currentPage = 1;
     },
     refresh() {
       switch (this.mode) {
@@ -765,8 +809,17 @@ export default {
 
     goToProcess(process) {
       this.$router.push({ name: "processDetails", params: { process } });
-    }
+    },
 
+    toggleSelect() {
+      if (this.selectedProcesses.length) {
+        this.selectedProcesses = [];
+      } else {
+        this.processes.map(p => {
+          this.selectedProcesses.push(p._id);
+        });
+      }
+    }
   },
   mounted() {
     this.firstForm();

@@ -98,9 +98,7 @@
         small
         responsive
         bordered
-        :filter="filter"
         :fields="items"
-        @filtered="onFiltered"
       >
         <template slot="created_at" slot-scope="row">
           {{
@@ -167,7 +165,6 @@ export default {
       demands: [],
       demand: {},
       totalRows: 1,
-      filter: null,
       currentPage: 1,
       perPage: 7,
       pageOptions: [5, 10, 15],
@@ -254,11 +251,6 @@ export default {
       } else {
         return true;
       }
-    },
-    onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
-      this.totalRows = filteredItems.length;
-      this.currentPage = 1;
     },
     refresh() {
       switch (this.mode) {

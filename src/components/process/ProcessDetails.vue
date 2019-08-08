@@ -27,7 +27,6 @@
               <b-form-select
                 id="etapa"
                 v-model="obj.stageId"
-                v-validate="{ required: true }"
                 @change="chooseResults($event)"
               >
                 <option v-for="stage in stages" :value="stage._id" :key="stage._id">{{stage.name}}</option>
@@ -45,7 +44,6 @@
               <b-form-select
                 id="resultado"
                 v-model="obj.stageResultId"
-                v-validate="{ required: true }"
               >
                 <option
                   v-for="result in results"
@@ -71,7 +69,6 @@
                 id="ocorrencia"
                 v-model="obj.occurrence"
                 :readonly="mode === 'remove'"
-                v-validate="{ required: true, min: 3 }"
               ></b-form-textarea>
             </b-form-group>
           </b-col>
@@ -332,10 +329,7 @@ export default {
         ? this.stages[this.currentStagePosition].name
         : this.stages[0].name;
 
-      let stageResults = this.stages[this.currentStagePosition]
-        ? this.stages[this.currentStagePosition].results
-        : this.stages[0].results;
-
+  
       this.chooseResults(stageId);
 
       this.obj = {
@@ -383,20 +377,6 @@ export default {
       this.results = st[0].results;
     },
 
-    previousStage(stagePreviousId, processStageId) {
-      return stagePreviousId == processStageId ? true : false;
-    },
-
-    showSpanError(campo) {
-      let obj = this.errors.items;
-      let index = obj.findIndex(val => val.field == campo);
-      if (index < 0) {
-        return false;
-      } else {
-        return true;
-      }
-    },
-
     loadInitialData() {
       this.process = this.$route.params.process;
       this.getProgresses(this.process._id);
@@ -423,4 +403,5 @@ export default {
   margin-top: 21px;
   color: white;
 }
+
 </style>

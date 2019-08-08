@@ -8,12 +8,27 @@
 
       <div v-if="!forgotPass" class="text-center">
         <div class="auth-title">Login</div>
-        <input v-model="user.email" type="text" placeholder="E-mail" />
-        <input v-if="!forgotPass" v-model="user.password" type="password" placeholder="Senha" />
-        <button @click="signin" class="mb-3">Entrar</button>
+        
+        <b-form-group>
+        <b-input-group prepend="<i class='fas fa-at'>">
+        <b-form-input v-model="user.email" type="text" placeholder="E-mail" />
+        </b-input-group>
+        </b-form-group>
+        
+        
+        <b-form-group>
+        <b-input-group prepend="<i class='fas fa-lock'>">
+        <b-form-input v-if="!forgotPass" v-model="user.password" type="password" placeholder="Senha" />
+        </b-input-group>
+        </b-form-group>
+
+        
+        
+        <b-button @click="signin" class="mb-3">Entrar</b-button>
         <div>
           <a href="#" @click="forgotPass = true">Esqueci a senha</a>
         </div>
+        
       </div>
 
       <div v-if="forgotPass" class="text-center">
@@ -98,6 +113,7 @@ export default {
 
 <style>
 .auth-content {
+  background-color: #006999;
   height: 100%;
   display: flex;
   justify-content: center;
@@ -106,10 +122,11 @@ export default {
 }
 
 .auth-modal {
-  background-color: #fff;
+  background-color: rgb(46, 46, 44);
+  color: white;
   width: 350px;
   padding: 35px;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 5px rgba(10, 10, 10, 0.712);
 
   display: flex;
   flex-direction: column;

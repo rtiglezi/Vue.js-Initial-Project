@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <Header title="[e-Proc 2]"/>
     <Loading v-if="validatingToken"/>
     <Content v-else/>
     <Footer/>
@@ -65,10 +64,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
   height: 100vh;
   display: grid;
-  grid-template-rows: 65px 1fr 20px;
+  grid-template-rows: 1fr 20px;
   grid-template-columns: 1fr;
   grid-template-areas:
-    "header"
     "content"
     "footer";
 }
@@ -115,13 +113,14 @@ body {
 
 .table-th {
   background-color: #8fc0df;
-  color: #333;
+  color: black;
+  font-size: .8em;
   font-weight: 100;
 }
 .table-td {
   background-color: white;
   color: black;
-  font-size: 15px;
+  font-size: .8em;
 }
 
 .table-th2 {

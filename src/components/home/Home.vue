@@ -5,7 +5,8 @@
     <div v-for="demand in demands" :key="demand._id" class="mb-2">
       <b-card style="background-color: #eee">
         Quantidade de processos de
-        <strong>{{ demand.name }}</strong> na unidade <strong>Nome da Unidade</strong> que aguardam as etapas a seguir:
+        <strong>{{ demand.name }}</strong> na unidade
+        <strong>Nome da Unidade</strong> que aguardam as etapas a seguir:
         <hr />
         <b-row>
           <b-col
@@ -20,14 +21,12 @@
               <b-col md="10">
                 <b-card class="box">
                   <div style="font-size:.9em; color:grey">etapa #{{index+1}}:</div>
-                  
-                  <div class="stage_name">{{stage.name}}:</div>
-                  <hr/>
 
-                  <div class="result" v-if="index-1>=0">
-                      {{ stageCount(demand.stages[index-1]._id) }} 
-                 </div>
-            
+                  <div class="stage_name">{{stage.name}}:</div>
+                  <hr />
+
+                  <div class="result" v-if="index-1>=0"></div>
+
                   <div class="result" v-if="index-1<0">--</div>
                   <span style="font-size:0.8em">aguardando...</span>
                 </b-card>
@@ -69,11 +68,6 @@ export default {
       axios.get(url).then(res => {
         this.processes = res.data;
       });
-    },
-    stageCount(stageId) {
-      let count = 0;
-      count = this.processes.filter(x => x.stageId === stageId);
-      return count.length;
     }
   },
   mounted() {

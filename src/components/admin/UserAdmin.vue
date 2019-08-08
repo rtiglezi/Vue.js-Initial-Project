@@ -200,10 +200,7 @@
         bordered
         responsive
         small
-        :filter="filter"
-        :fields="items"
-        @filtered="onFiltered"
-      >
+        :fields="items">
         <template slot="created_at" slot-scope="row">
           {{
           (new Date(row.item.created_at).getDate().toString().length == 1) ? "0" + new Date(row.item.created_at).getDate() : new Date(row.item.created_at).getDate()
@@ -289,7 +286,6 @@ export default {
         profiles: ["user"]
       },
       totalRows: 1,
-      filter: null,
       currentPage: 1,
       perPage: 7,
       pageOptions: [5, 10, 15],
@@ -423,11 +419,6 @@ export default {
         this.users = res.data;
         this.totalRows = res.data.length;
       });
-    },
-    onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
-      this.totalRows = filteredItems.length;
-      this.currentPage = 1;
     },
     refresh() {
       switch (this.mode) {

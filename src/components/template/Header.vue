@@ -13,22 +13,21 @@
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
           <b-nav-form class="mr-5">
-            <span style="color: white; margin-right: 2px;">Pesquisar:</span>
-            <b-form-input size="sm" class="mr-sm-2" placeholder="número processo..."></b-form-input>
+            
+            <span style="color: white" class="mr-2">Pesquisar:</span>
+            
+            <b-form-input
+              style="border-width:2px; 
+                     border-color: #C8A741; 
+                     border-radius: 3px;"
+              class="mr-1"
+              placeholder="número do processo..."
+            ></b-form-input>
 
-            <b-form-select size="sm" @change="changeDivision($event)">
-              <option
-                v-for="division in divisions"
-                :value="division._id"
-                :key="division._id"
-              >{{division.name}}</option>
-            </b-form-select>
+            <b-button style="background-color: orange">
+              <i class="fas fa-search"></i>
+            </b-button>
 
-            <i
-              @click="navigate('/processes')"
-              class="fab fa-buffer fa-2x ml-2"
-              style="color:white; cursor:pointer"
-            ></i>
           </b-nav-form>
 
           <b-nav-item-dropdown right>
@@ -54,9 +53,6 @@
 import { userKey } from "@/global";
 import { mapState } from "vuex";
 
-import { baseApiUrl } from "@/global";
-import axios from "axios";
-
 export default {
   name: "Header",
   computed: mapState(["user"]),
@@ -72,30 +68,11 @@ export default {
     navigate(link) {
       this.$router.push(link);
     },
-    loadDivisions() {
-      const url = `${baseApiUrl}/divisions`;
-      axios.get(url).then(res => {
-        this.divisions = res.data;
-      });
-    },
-    changeDivision(division) {
-      let userObj = {
-        lastDivision: division
-      }
-      const url = `${baseApiUrl}/users/${this.user._id}/changedivision`;
-      axios.patch(url, userObj).then(usr => {
-        alert('Unidade alterada!')
-        this.navigate('/processes')
-      });
-    },
     logout() {
       localStorage.removeItem(userKey);
       this.$store.commit("setUser", null);
       this.$router.push({ name: "auth" });
     }
-  },
-  mounted() {
-    this.loadDivisions();
   }
 };
 </script>

@@ -73,7 +73,6 @@ export default {
 <style>
 .profile {
   text-align: center;
-  padding: 5px;
   border-radius: 5px;
 }
 .profile .box {
