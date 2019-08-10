@@ -171,21 +171,34 @@
     <b-table id="my-table" :items="allProgresses" bordered responsive small :fields="items">
       <template slot="arrayStages" slot-scope="row">
         <div
-          v-if="row.item.stage == 'Atribuição'"
-          style="color:#bbb; font-style:italic"
-        >{{ row.item.stage}}</div>
+          v-if="
+          (row.item.stage == 'Atribuição') 
+          || 
+          (row.item.stage == 'Tramitação')
+          || 
+          (row.item.stage == 'Recebimento')
+          "
+          style="color:#888"
+        >[{{ row.item.stage}}]</div>
         <div v-for="(item,index) in row.item.arrayStages" :key="item._id" :index="index">
-          <div style="color:brown" v-if="item._id === row.item.stage">{{ item.name}}</div>
+          <div style="color:black; font-weight:bold" v-if="item._id === row.item.stage">
+            <i class="fas fa-flag mr-1"></i>
+            {{ item.name}}
+          </div>
         </div>
       </template>
       <template slot="occurrence" slot-scope="row">
         <div
-          v-if="row.item.stage == 'Atribuição'"
-          style="color:#bbb; font-style:italic"
-        >{{ row.item.occurrence}}</div>
-        <div
-          v-else
-        >{{ row.item.occurrence}}</div>
+          v-if="
+          (row.item.stage == 'Atribuição') 
+          || 
+          (row.item.stage == 'Tramitação')
+          || 
+          (row.item.stage == 'Recebimento')
+          "
+          style="color:#888"
+        >[{{ row.item.occurrence}}]</div>
+        <div v-else>{{ row.item.occurrence}}</div>
       </template>
     </b-table>
   </div>
@@ -369,7 +382,6 @@ export default {
 
             this.allProgresses = this.progresses.slice();
             this.allProgresses = this.allProgresses.reverse();
-
           });
         });
     },

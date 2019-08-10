@@ -6,8 +6,35 @@
 
     <b-modal
       v-bind:hide-footer="true"
-      id="mymodal2"
-      v-model="modalShow2"
+      id="myModalSend"
+      v-model="modalShowSend"
+      title="Tramitação de processos"
+    >
+      Tramitar {{ selectedProcesses.length }} processo(s) selecionado(s) à Unidade:
+      <b-form-select @change="sendProcessesToDivision($event)">
+        <option
+          v-for="division in divisions"
+          :value="division._id"
+          :key="division._id"
+        >{{division.name}}</option>
+      </b-form-select>
+
+      <br />
+      <br />
+
+      <div class="text-right">
+        <b-button @click="fncSend()" class="btn-main ml-2">
+          <i class="fa fa-send"></i>
+          Atribuir
+        </b-button>
+        <b-button class="ml-2" variant="secondary" @click="clickModalSend()">Cancelar</b-button>
+      </div>
+    </b-modal>
+
+    <b-modal
+      v-bind:hide-footer="true"
+      id="myModalAssign"
+      v-model="modalShowAssign"
       title="Atribuição de processos"
     >
       Atribuir {{ selectedProcesses.length }} processo(s) selecionado(s) ao usuário:
@@ -23,15 +50,15 @@
           <i class="fa fa-send"></i>
           Atribuir
         </b-button>
-        <b-button class="ml-2" variant="secondary" @click="clickModalBtn2()">Cancelar</b-button>
+        <b-button class="ml-2" variant="secondary" @click="clickModalAssign()">Cancelar</b-button>
       </div>
     </b-modal>
 
     <b-modal
       size="lg"
       v-bind:hide-footer="true"
-      id="mymodal"
-      v-model="modalShow"
+      id="myModalProcess"
+      v-model="modalShowProcess"
       title="Cadastro de Processo"
     >
       <!-- INICIO FORMULÁRIO DE CADASTRO -->
@@ -271,7 +298,7 @@
             <i class="far fa-trash-alt"></i>
             Excluir?
           </b-button>
-          <b-button class="ml-2" variant="secondary" @click="clickModalBtn()">Cancelar</b-button>
+          <b-button class="ml-2" variant="secondary" @click="clickModalProcess()">Cancelar</b-button>
         </div>
       </b-form>
       <!-- FINAL FORMULÁRIO DE CADASTRO -->
@@ -282,21 +309,21 @@
       <b-row>
         <b-col>
           <div style="text-align:left">
-            <b-button size="sm" variant="outline-success" class="mr-2" v-b-modal="'mymodal'">
+            <b-button size="sm" variant="outline-success" class="mr-2" v-b-modal="'myModalProcess'">
               <i class="fas fa-plus"></i>
               Adicionar
             </b-button>
-            <b-button size="sm" variant="outline-info" class="mr-2" v-b-modal="'mymodal'">
+            <b-button size="sm" variant="outline-info" class="mr-2" v-b-modal="'myModalProcess'">
               <i class="fas fa-search"></i>
               Pesquisar
             </b-button>
 
             <b-button
               size="sm"
-              variant="secondary"
+              variant="outline-dark"
               v-if="selectedProcesses.length"
               class="mr-2"
-              v-b-modal="'mymodal2'"
+              v-b-modal="'myModalAssign'"
             >
               <i class="fas fa-share"></i>
               <i class="fas fa-user-check"></i>
@@ -305,10 +332,10 @@
 
             <b-button
               size="sm"
-              variant="secondary"
+              variant="outline-dark"
               v-if="selectedProcesses.length"
               class="mr-2"
-              v-b-modal="'mymodal'"
+              v-b-modal="'myModalSend'"
             >
               <i class="fas fa-share"></i>
               <i class="fas fa-sitemap"></i>
@@ -317,7 +344,7 @@
 
             <b-button
               size="sm"
-              variant="danger"
+              variant="outline-danger"
               @click="selectedProcesses=[]"
               v-if="selectedProcesses.length"
               class="mr-2"
@@ -344,7 +371,6 @@
         small
         :fields="items"
       >
-        
         <template slot="progresses" slot-scope="row">
           <div v-for="(item, index) in row.item.progresses" :index="index" :key="item._id">
             <div
@@ -375,9 +401,8 @@
 
         <template slot="number" slot-scope="row">
           <a
-            style="color:#006999"
+            :style="{color: (row.item.submitted) ? 'red' : ''}"
             href="#"
-            v-b-modal="'mymodal'"
             @click.prevent="goToProcess(row.item)"
           >{{row.item.number}}</a>
         </template>
@@ -385,7 +410,7 @@
         <template slot="actions" slot-scope="data">
           <a
             href="#"
-            v-b-modal="'mymodal'"
+            v-b-modal="'myModalProcess'"
             variant="danger"
             class="ml-1"
             @click.prevent="loadResource(data.item, 'edit')"
@@ -394,7 +419,7 @@
           </a>
           <a
             href="#"
-            v-b-modal="'mymodal'"
+            v-b-modal="'myModalProcess'"
             variant="danger"
             class="ml-1"
             @click.prevent="loadResource(data.item, 'remove')"
@@ -438,8 +463,9 @@ export default {
     return {
       selectedProcesses: [],
       loading: false,
-      modalShow: false,
-      modalShow2: false,
+      modalShowSend: false,
+      modalShowAssign: false,
+      modalShowProcess: false,
       btnCancelDisabled: false,
       mode: "save",
       divisions: [],
@@ -447,6 +473,7 @@ export default {
       stages: [],
       users: [],
       assign: {},
+      send: {},
       requester: [],
       process: {
         requester: {
@@ -554,11 +581,14 @@ export default {
     };
   },
   methods: {
-    clickModalBtn() {
-      this.modalShow = false;
+    clickModalProcess() {
+      this.modalShowProcess = false;
     },
-    clickModalBtn2() {
-      this.modalShow2 = false;
+    clickModalAssign() {
+      this.modalShowAssign = false;
+    },
+    clickModalSend() {
+      this.modalShowSend = false;
     },
     loadUsers() {
       const url = `${baseApiUrl}/users/assign`;
@@ -815,7 +845,7 @@ export default {
     },
 
     firstForm() {
-      this.clickModalBtn();
+      this.clickModalProcess();
       this.mode = "save";
       this.loadResources();
       this.process = {};
@@ -828,8 +858,21 @@ export default {
       this.loadDemands(this.user.tenant);
     },
 
+    receive(process) {
+      axios
+        .post(`${baseApiUrl}/processes/${process._id}/receive`, {})
+        .then(() => {
+          this.$router.push({ name: "processDetails", params: { process } });
+        })
+        .catch();
+    },
+
     goToProcess(process) {
-      this.$router.push({ name: "processDetails", params: { process } });
+      if (process.submitted) {
+        this.receive(process);
+      } else {
+        this.$router.push({ name: "processDetails", params: { process } });
+      }
     },
 
     toggleSelect() {
@@ -840,6 +883,24 @@ export default {
           this.selectedProcesses.push(p._id);
         });
       }
+    },
+
+    sendProcessesToDivision(division) {
+      this.send = {
+        divisionId: division,
+        processesId: this.selectedProcesses
+      };
+    },
+
+    fncSend() {
+      axios
+        .post(`${baseApiUrl}/processes/send`, this.send)
+        .then(() => {
+          this.selectedProcesses = [];
+          this.loadResources();
+          this.clickModalSend();
+        })
+        .catch();
     },
 
     assignProcessesToUser(user) {
@@ -855,7 +916,7 @@ export default {
         .then(() => {
           this.selectedProcesses = [];
           this.loadResources();
-          this.clickModalBtn2();
+          this.clickModalAssign();
         })
         .catch();
     }
