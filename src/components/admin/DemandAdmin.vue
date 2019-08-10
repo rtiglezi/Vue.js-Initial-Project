@@ -100,15 +100,6 @@
         bordered
         :fields="items"
       >
-        <template slot="created_at" slot-scope="row">
-          {{
-          (new Date(row.item.created_at).getDate().toString().length == 1) ? "0" + new Date(row.item.created_at).getDate() : new Date(row.item.created_at).getDate()
-          }}/{{
-          ((new Date(row.item.created_at).getMonth() + 1).toString().length == 1) ? "0" + (new Date(row.item.created_at).getMonth()+1) : (new Date(row.item.created_at).getMonth())+1
-          }}/{{
-          new Date(row.item.created_at).getFullYear()
-          }}
-        </template>
 
         <template slot="actions" slot-scope="data">
           <b-button v-b-modal="'mymodal'" @click="loadResource(data.item, 'edit')">

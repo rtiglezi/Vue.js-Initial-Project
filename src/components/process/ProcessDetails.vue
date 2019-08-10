@@ -1,8 +1,6 @@
 <template>
   <div class="processDetails">
-   
     <PageTitle main="processes" />
-
     <b-modal
       v-model="modalShow"
       size="lg"
@@ -24,11 +22,7 @@
               label-for="etapa"
               description="Etapa que você acabou de realizar."
             >
-              <b-form-select
-                id="etapa"
-                v-model="obj.stageId"
-                @change="chooseResults($event)"
-              >
+              <b-form-select id="etapa" v-model="obj.stageId" @change="chooseResults($event)">
                 <option v-for="stage in stages" :value="stage._id" :key="stage._id">{{stage.name}}</option>
               </b-form-select>
             </b-form-group>
@@ -41,10 +35,7 @@
               label-for="resultado"
               description="Informe qual foi o resultado gerado."
             >
-              <b-form-select
-                id="resultado"
-                v-model="obj.stageResultId"
-              >
+              <b-form-select id="resultado" v-model="obj.stageResultId">
                 <option
                   v-for="result in results"
                   :value="result._id"
@@ -177,23 +168,24 @@
 
     <div class="layer-total">Histórico de ocorrências do processo</div>
 
-    <b-table id="my-table" :items="progresses" bordered responsive small :fields="items">
-      <template slot="updated_at" slot-scope="row">
-        <div style="color:#888">
-          {{
-          (new Date(row.item.updated_at).getDate().toString().length == 1) ? "0" + new Date(row.item.updated_at).getDate() : new Date(row.item.updated_at).getDate()
-          }}/{{
-          ((new Date(row.item.updated_at).getMonth() + 1).toString().length == 1) ? "0" + (new Date(row.item.updated_at).getMonth()+1) : (new Date(row.item.updated_at).getMonth())+1
-          }}/{{
-          new Date(row.item.updated_at).getFullYear()
-          }}
+    <b-table id="my-table" :items="allProgresses" bordered responsive small :fields="items">
+      <template slot="arrayStages" slot-scope="row">
+        <div
+          v-if="row.item.stage == 'Atribuição'"
+          style="color:#bbb; font-style:italic"
+        >{{ row.item.stage}}</div>
+        <div v-for="(item,index) in row.item.arrayStages" :key="item._id" :index="index">
+          <div style="color:brown" v-if="item._id === row.item.stage">{{ item.name}}</div>
         </div>
       </template>
-
-      <template slot="arrayStages" slot-scope="row">
-        <div v-for="(item,index) in row.item.arrayStages" :key="item._id" :index="index">
-          <div style="color:brown" v-if="item._id === row.item.stageId">{{ item.name}}</div>
-        </div>
+      <template slot="occurrence" slot-scope="row">
+        <div
+          v-if="row.item.stage == 'Atribuição'"
+          style="color:#bbb; font-style:italic"
+        >{{ row.item.occurrence}}</div>
+        <div
+          v-else
+        >{{ row.item.occurrence}}</div>
       </template>
     </b-table>
   </div>
@@ -213,11 +205,13 @@ export default {
       modalShow: false,
       mode: "save",
       process: {},
-      stages: {},
+      stages: [],
       stage: {},
-      results: {},
+      results: [],
       progress: {},
-      progresses: {},
+      progresses: [],
+      automatics: [],
+      allProgresses: [],
       obj: {},
       totalRows: 0,
       items: [
@@ -329,7 +323,6 @@ export default {
         ? this.stages[this.currentStagePosition].name
         : this.stages[0].name;
 
-  
       this.chooseResults(stageId);
 
       this.obj = {
@@ -358,10 +351,27 @@ export default {
 
     getProgresses(processId) {
       const url = `${baseApiUrl}/progresses?processId=${processId}`;
-      axios.get(url).then(res => {
-        this.progresses = res.data;
-        this.totalRows = res.data.length;
-      });
+      axios
+        .get(url)
+        .then(res => {
+          this.progresses = res.data;
+          this.totalRows = res.data.length;
+        })
+        .then(() => {
+          const url = `${baseApiUrl}/automatics?processId=${processId}`;
+          axios.get(url).then(res => {
+            this.automatics = res.data;
+            this.progresses = this.progresses.concat(this.automatics);
+
+            this.progresses.sort((a, b) =>
+              a.updated_at > b.updated_at ? 1 : -1
+            );
+
+            this.allProgresses = this.progresses.slice();
+            this.allProgresses = this.allProgresses.reverse();
+
+          });
+        });
     },
 
     loadStages(demandId) {
@@ -403,5 +413,4 @@ export default {
   margin-top: 21px;
   color: white;
 }
-
 </style>

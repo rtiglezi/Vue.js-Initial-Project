@@ -5,6 +5,29 @@
     <PageTitle main="processes" />
 
     <b-modal
+      v-bind:hide-footer="true"
+      id="mymodal2"
+      v-model="modalShow2"
+      title="Atribuição de processos"
+    >
+      Atribuir {{ selectedProcesses.length }} processo(s) selecionado(s) ao usuário:
+      <b-form-select @change="assignProcessesToUser($event)">
+        <option v-for="user in users" :value="user._id" :key="user._id">{{user.name}}</option>
+      </b-form-select>
+
+      <br />
+      <br />
+
+      <div class="text-right">
+        <b-button @click="fncAssign()" class="btn-main ml-2">
+          <i class="fa fa-send"></i>
+          Atribuir
+        </b-button>
+        <b-button class="ml-2" variant="secondary" @click="clickModalBtn2()">Cancelar</b-button>
+      </div>
+    </b-modal>
+
+    <b-modal
       size="lg"
       v-bind:hide-footer="true"
       id="mymodal"
@@ -232,7 +255,7 @@
             v-if="mode === 'save'"
             @click="save"
           >
-            <i class="fa fa-send "></i>
+            <i class="fa fa-send"></i>
             Inserir
           </b-button>
           <b-button
@@ -241,11 +264,11 @@
             v-if="mode === 'edit'"
             @click="save"
           >
-            <i class="fas fa-save "></i>
+            <i class="fas fa-save"></i>
             Salvar Edição
           </b-button>
           <b-button variant="danger" class="ml-2" v-if="mode === 'remove'" @click="remove">
-            <i class="far fa-trash-alt "></i>
+            <i class="far fa-trash-alt"></i>
             Excluir?
           </b-button>
           <b-button class="ml-2" variant="secondary" @click="clickModalBtn()">Cancelar</b-button>
@@ -273,10 +296,10 @@
               variant="secondary"
               v-if="selectedProcesses.length"
               class="mr-2"
-              v-b-modal="'mymodal'"
+              v-b-modal="'mymodal2'"
             >
               <i class="fas fa-share"></i>
-              <i class="fas fa-user-check "></i>
+              <i class="fas fa-user-check"></i>
               Atribuir
             </b-button>
 
@@ -288,7 +311,7 @@
               v-b-modal="'mymodal'"
             >
               <i class="fas fa-share"></i>
-              <i class="fas fa-sitemap "></i>
+              <i class="fas fa-sitemap"></i>
               Tramitar
             </b-button>
 
@@ -299,8 +322,7 @@
               v-if="selectedProcesses.length"
               class="mr-2"
             >
-              <i class="fas fa-times  mr-1"></i>
-
+              <i class="fas fa-times mr-1"></i>
               Limpar seleção de {{ (selectedProcesses.length) ? selectedProcesses.length : '0' }} processo(s)
             </b-button>
           </div>
@@ -322,23 +344,12 @@
         small
         :fields="items"
       >
-        <template slot="updated_at" slot-scope="row">
-          <div style="color:#888">
-            {{
-            (new Date(row.item.updated_at).getDate().toString().length == 1) ? "0" + new Date(row.item.updated_at).getDate() : new Date(row.item.updated_at).getDate()
-            }}/{{
-            ((new Date(row.item.updated_at).getMonth() + 1).toString().length == 1) ? "0" + (new Date(row.item.updated_at).getMonth()+1) : (new Date(row.item.updated_at).getMonth())+1
-            }}/{{
-            new Date(row.item.updated_at).getFullYear()
-            }}
-          </div>
-        </template>
-
+        
         <template slot="progresses" slot-scope="row">
           <div v-for="(item, index) in row.item.progresses" :index="index" :key="item._id">
             <div
               style="color: brown"
-              v-if="index == row.item.progresses.length-1"
+              v-if="(index == row.item.progresses.length-1) "
             >{{ getStageName(item.demand, item.stage) }}</div>
           </div>
         </template>
@@ -428,12 +439,14 @@ export default {
       selectedProcesses: [],
       loading: false,
       modalShow: false,
+      modalShow2: false,
       btnCancelDisabled: false,
       mode: "save",
       divisions: [],
       demands: [],
       stages: [],
       users: [],
+      assign: {},
       requester: [],
       process: {
         requester: {
@@ -489,7 +502,6 @@ export default {
           thClass: "table-th",
           tdClass: "table-td"
         },
-
         {
           key: "requesterName",
           label: "Solicitante",
@@ -523,7 +535,7 @@ export default {
           tdClass: "table-td"
         },
         {
-          key: "atribuicao",
+          key: "userName",
           label: "Atribuição",
           sortable: true,
           class: "text-left",
@@ -544,6 +556,15 @@ export default {
   methods: {
     clickModalBtn() {
       this.modalShow = false;
+    },
+    clickModalBtn2() {
+      this.modalShow2 = false;
+    },
+    loadUsers() {
+      const url = `${baseApiUrl}/users/assign`;
+      axios.get(url).then(res => {
+        this.users = res.data;
+      });
     },
     loadDivisions(tenant) {
       const url = `${baseApiUrl}/divisions?tenant=${tenant}`;
@@ -819,10 +840,29 @@ export default {
           this.selectedProcesses.push(p._id);
         });
       }
+    },
+
+    assignProcessesToUser(user) {
+      this.assign = {
+        userId: user,
+        processesId: this.selectedProcesses
+      };
+    },
+
+    fncAssign() {
+      axios
+        .post(`${baseApiUrl}/processes/assign`, this.assign)
+        .then(() => {
+          this.selectedProcesses = [];
+          this.loadResources();
+          this.clickModalBtn2();
+        })
+        .catch();
     }
   },
   mounted() {
     this.firstForm();
+    this.loadUsers();
   }
 };
 </script>
