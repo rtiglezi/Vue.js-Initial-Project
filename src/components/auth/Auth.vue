@@ -1,42 +1,46 @@
 <template>
   <div class="auth-content" v-on:keyup.enter="submitByKey">
     <div class="auth-modal">
-      <img src="@/assets/c-proc.png" alt="Logo" width="80" align="left" />
-      <span class="auth-logo">ceproc</span>
+      <div class="text-center">
+        <img src="@/assets/c-proc.png" alt="Logo" width="80" />
+        <br />
+        <span class="auth-logo">ceproc</span>
+      </div>
 
       <hr />
 
       <div v-if="!forgotPass" class="text-center">
         <div class="auth-title">Login</div>
-        
+
         <b-form-group>
-        <b-input-group prepend="<i class='fas fa-at'>">
-        <b-form-input v-model="user.email" type="text" placeholder="E-mail" />
-        </b-input-group>
-        </b-form-group>
-        
-        
-        <b-form-group>
-        <b-input-group prepend="<i class='fas fa-lock'>">
-        <b-form-input v-if="!forgotPass" v-model="user.password" type="password" placeholder="Senha" />
-        </b-input-group>
+          <b-form-input v-model="user.email" type="text" placeholder="E-mail" />
         </b-form-group>
 
-        
-        
-        <b-button @click="signin" class="mb-3">Entrar</b-button>
+        <b-form-group>
+          <b-form-input
+            v-if="!forgotPass"
+            v-model="user.password"
+            type="password"
+            placeholder="Senha"
+          />
+        </b-form-group>
+
+        <b-button variant="dark" @click="signin" class="mb-3">Entrar</b-button>
         <div>
           <a href="#" @click="forgotPass = true">Esqueci a senha</a>
         </div>
-        
       </div>
 
       <div v-if="forgotPass" class="text-center">
         <div class="auth-title">Redefinir a Senha</div>
         <b-form-input v-model="user.email" type="text" placeholder="E-mail" />
         <div :class="lblClass">{{txtLabel}}</div>
-        <div class="mt-3"><b-button @click="forgot" class="mb-3">{{ txtButton }}</b-button></div>
-        <div><a href="#" @click="forgotPass = false">Voltar ao login</a></div>
+        <div class="mt-3">
+          <b-button variant="dark" @click="forgot" class="mb-3">{{ txtButton }}</b-button>
+        </div>
+        <div>
+          <a href="#" @click="forgotPass = false">Voltar ao login</a>
+        </div>
       </div>
     </div>
   </div>
@@ -113,7 +117,7 @@ export default {
 
 <style>
 .auth-content {
-  background-color: #006999;
+  background-color: #333;
   height: 100%;
   display: flex;
   justify-content: center;
@@ -122,13 +126,11 @@ export default {
 }
 
 .auth-modal {
-  background-color: rgb(46, 46, 44);
-  color: white;
+  background-color: #ddd;
+  color: #555;
   width: 350px;
   padding: 35px;
   box-shadow: 0 1px 5px rgba(10, 10, 10, 0.712);
-
-  display: flex;
   flex-direction: column;
   align-items: center;
 }
@@ -146,17 +148,8 @@ export default {
 }
 
 .auth-modal input {
-  border: 1px solid #bbb;
+  border: 1px solid #888;
   width: 100%;
-  margin-bottom: 15px;
-  padding: 3px 8px;
-}
-
-.auth-modal button {
-  align-self: flex-end;
-  background-color: #2460ae;
-  color: #fff;
-  padding: 5px 15px;
 }
 
 .auth-modal a {

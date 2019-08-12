@@ -1,6 +1,31 @@
 <template>
   <div class="processDetails">
     <PageTitle main="processes" />
+
+    <b-modal
+      v-bind:hide-footer="true"
+      id="myModalAssign"
+      v-model="modalShowAssign"
+      title="Atribuição de processos"
+    >
+      Atribuir este processo ao usuário:
+      <b-form-select @change="assignProcessesToUser($event)">
+        <option v-for="user in users" :value="user._id" :key="user._id">{{user.name}}</option>
+      </b-form-select>
+
+      <br />
+      <br />
+
+      <div class="text-right">
+        <b-button @click="fncAssign()" class="btn-main ml-2">
+          <i class="fa fa-send"></i>
+          Atribuir
+        </b-button>
+        <b-button class="ml-2" variant="secondary" @click="clickModalAssign()">Cancelar</b-button>
+      </div>
+
+    </b-modal>
+
     <b-modal
       v-model="modalShow"
       size="lg"
@@ -112,6 +137,12 @@
       </b-col>
     </b-row>
 
+    <b-button size="sm" variant="outline-dark" class="mr-2 mb-2" v-b-modal="'myModalAssign'">
+      <i class="fas fa-share"></i>
+      <i class="fas fa-user-check"></i>
+      Atribuir
+    </b-button>
+
     <b-card class="mb-2" style="background-color:#DDD; text-align: center">
       <b-button variant="link" size="small" v-b-toggle.collapse-3 class="m-2" style="color:black">
         Última etapa:
@@ -214,11 +245,14 @@ export default {
   components: { PageTitle },
   data: function() {
     return {
+      modalShowAssign: false,
+      assign: {},
       currentStagePosition: null,
       modalShow: false,
       mode: "save",
       process: {},
       stages: [],
+      users: [],
       stage: {},
       results: [],
       progress: {},
@@ -403,10 +437,40 @@ export default {
       this.process = this.$route.params.process;
       this.getProgresses(this.process._id);
       this.loadStages(this.process.demandId);
+    },
+
+    assignProcessesToUser(user) {
+      this.assign = {
+        userId: user,
+        processesId: [this.process._id]
+      };
+    },
+
+    fncAssign() {
+      axios
+        .post(`${baseApiUrl}/processes/assign`, this.assign)
+        .then(() => {
+          this.clickModalAssign();
+          this.loadInitialData();
+        })
+        .catch();
+    },
+
+    clickModalAssign() {
+      this.modalShowAssign = false;
+    },
+
+    loadUsers() {
+      const url = `${baseApiUrl}/users/assign`;
+      axios.get(url).then(res => {
+        this.users = res.data;
+      });
     }
   },
+
   mounted() {
     this.loadInitialData();
+    this.loadUsers();
   }
 };
 </script>
