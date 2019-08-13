@@ -5,6 +5,82 @@
     <PageTitle main="processes" />
 
     <b-modal
+      v-model="modalShow"
+      size="lg"
+      v-bind:hide-footer="true"
+      id="modal-1"
+      style="color: red; font-weight: bold"
+      title="Registro coletivo de andamento nos processos selecionados."
+    >
+      <div style="font-size: .8em">
+      Atenção!!!<br> 
+      Você está realizando um registro coletivo em {{selectedProcesses.length}} processo(s).<br>
+      Tenha em mente que cada um dos processos selecionados terá seus atual andamento alterado.<br>
+      Antes de continuar, tenha certeza de que todos os processos selecionados devem ter ser alterados para a mesma etapa.
+      <hr>
+      </div>
+
+      <!-- INICIO FORMULÁRIO DE CADASTRO -->
+      <b-form v-on:submit.prevent="onSubmit">
+        <b-row>
+          <b-col style="color: red" md="4" sm="12" class="box-ico"></b-col>
+        </b-row>
+        <b-row>
+          <b-col md="6">
+            <b-form-group
+              id="fieldset-etapa"
+              label="Etapa a ser registrada:"
+              label-for="etapa"
+              description="Etapa que você acabou de realizar."
+            >
+              <b-form-select id="etapa" v-model="obj.stageId" @change="chooseResults($event)">
+                <option v-for="stage in stages" :value="stage._id" :key="stage._id">{{stage.name}}</option>
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+          <b-col md="6">
+            <b-form-group
+              v-if="results.length > 0"
+              id="fieldset-resultado"
+              label="Resultado gerado:"
+              label-for="resultado"
+              description="Informe qual foi o resultado gerado."
+            >
+              <b-form-select id="resultado" v-model="obj.stageResultId">
+                <option
+                  v-for="result in results"
+                  :value="result._id"
+                  :key="result._id"
+                >{{result.name}}</option>
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            <b-form-group
+              id="fieldset-ocorrencia"
+              label="Ocorrência:"
+              label-for="ocorrência"
+              description="Faça um breve relato da ocorrência"
+            >
+              <b-form-textarea rows="5" max-rows="5" class="input-text" id="ocorrencia" v-model="obj.occurrence"></b-form-textarea>
+            </b-form-group>
+          </b-col>
+        </b-row>
+
+        <div class="text-right">
+          <b-button variant="danger" class="ml-2" @click="saveProgress">
+            <i class="fa fa-check fa-lg"></i>
+            Registrar Andamento no(s) {{selectedProcesses.length}} processo(s)
+          </b-button>
+          <b-button class="ml-2" variant="secondary" @click="clickModalBtn()">Cancelar</b-button>
+        </div>
+      </b-form>
+      <!-- FINAL FORMULÁRIO DE CADASTRO -->
+    </b-modal>
+
+    <b-modal
       v-bind:hide-footer="true"
       id="myModalSend"
       v-model="modalShowSend"
@@ -315,7 +391,7 @@
               class="mr-1 button-bar"
               v-b-modal="'myModalProcess'"
             >
-              <i class="fas fa-plus "></i>
+              <i class="fas fa-plus"></i>
             </b-button>
             <b-button
               v-b-popover.hover.top="'Pesquisar processo'"
@@ -323,7 +399,7 @@
               class="mr-1 button-bar"
               v-b-modal="'myModalProcess'"
             >
-              <i class="fas fa-search "></i>
+              <i class="fas fa-search"></i>
             </b-button>
 
             <b-button
@@ -334,7 +410,7 @@
               v-b-modal="'myModalAssign'"
             >
               <i class="fas fa-share"></i>
-              <i class="fas fa-user-check "></i>
+              <i class="fas fa-user-check"></i>
             </b-button>
 
             <b-button
@@ -345,7 +421,18 @@
               v-b-modal="'myModalSend'"
             >
               <i class="fas fa-share"></i>
-              <i class="fas fa-sitemap "></i>
+              <i class="fas fa-sitemap"></i>
+            </b-button>
+
+            <b-button
+              v-if="selectedProcesses.length"
+              v-b-popover.hover.top="'Atualizar o andamento'"
+              size="sm"
+              class="button-bar mr-1"
+              v-b-modal.modal-1
+              @click="getStages(processes[0].demandId[0])"
+            >
+              <i class="fas fa-flag"></i>
             </b-button>
 
             <b-button
@@ -469,6 +556,7 @@ export default {
     return {
       selectedProcesses: [],
       loading: false,
+      modalShow: false,
       modalShowSend: false,
       modalShowAssign: false,
       modalShowProcess: false,
@@ -477,6 +565,8 @@ export default {
       divisions: [],
       demands: [],
       stages: [],
+      obj: {},
+      results: [],
       users: [],
       assign: {},
       send: {},
@@ -587,6 +677,9 @@ export default {
     };
   },
   methods: {
+    clickModalBtn() {
+      this.modalShow = false;
+    },
     clickModalProcess() {
       this.modalShowProcess = false;
     },
@@ -642,6 +735,30 @@ export default {
       });
       return stageName;
     },
+
+    saveProgress() {
+      let index = 0
+      this.selectedProcesses.map(r => {
+
+         axios
+           .patch(
+             `${baseApiUrl}/processes/${r}/updateprgrs`,
+             this.obj
+           )
+           .then(() => {
+          
+              index++;
+             this.getResources();
+             this.$toasted.global.defaultSuccess({
+               msg: `${index}&#176; andamento realizado com sucesso.`
+             });
+              this.selectedProcesses = [];
+              this.clickModalBtn();
+              })
+           .catch();
+      });
+    },
+
     save() {
       const method = this.process._id ? "patch" : "post";
       const id = this.process._id ? `/${this.process._id}` : "";
@@ -891,6 +1008,19 @@ export default {
       }
     },
 
+    getStages(demandId) {
+      const url = `${baseApiUrl}/demands/${demandId}/stages`;
+      axios.get(url).then(res => {
+        this.stages = res.data;
+      });
+    },
+
+    chooseResults(stage) {
+      let st = {};
+      st = this.stages.filter(x => x._id === stage);
+      this.results = st[0].results;
+    },
+
     sendProcessesToDivision(division) {
       this.send = {
         divisionId: division,
@@ -931,6 +1061,7 @@ export default {
   mounted() {
     this.firstForm();
     this.getUsers();
+    
   }
 };
 </script>
@@ -939,7 +1070,7 @@ export default {
 .button-bar {
   color: #555;
   width: 50px;
-  height: 40px;
+  height: 35px;
   border-radius: 2px;
   background-color: white;
 }

@@ -61,7 +61,7 @@
       title="Registro de andamento no processo"
     >
       <!-- INICIO FORMULÁRIO DE CADASTRO -->
-      <b-form v-on:submit.prevent="onSubmit" v-on:keyup.enter="submitByKey">
+      <b-form v-on:submit.prevent="onSubmit">
         <b-row>
           <b-col style="color: green" md="4" sm="12" class="box-ico"></b-col>
         </b-row>
@@ -234,7 +234,7 @@
     </div>
 
     <b-collapse id="collapse-3">
-      <b-card class="mb-2" style="background-color:yellow; text-align: center">
+      <b-card class="mb-2" style="background-color:green; text-align: center">
         <div class="mt-2 mb-2">
           <b-row>
             <b-col
