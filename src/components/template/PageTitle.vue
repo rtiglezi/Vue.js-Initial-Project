@@ -78,7 +78,7 @@
 
              <b-form-select
               size="sm"
-              v-b-popover.hover.top="'Unidade atual'"
+              v-b-popover.hover.top="'Trocar a unidade atual'"
               id="input-horizontal"
               @change="changeDivision($event)"
               v-model="user.lastDivision"

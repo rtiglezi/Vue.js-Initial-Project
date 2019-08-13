@@ -25,7 +25,7 @@
       <div class="text-right">
         <b-button @click="fncSend()" class="btn-main ml-2">
           <i class="fa fa-send"></i>
-          Atribuir
+          Tramitar
         </b-button>
         <b-button class="ml-2" variant="secondary" @click="clickModalSend()">Cancelar</b-button>
       </div>
@@ -309,45 +309,51 @@
       <b-row>
         <b-col>
           <div style="text-align:left">
-            <b-button size="sm" variant="outline-success" class="mr-2" v-b-modal="'myModalProcess'">
-              <i class="fas fa-plus"></i>
-              Adicionar
+            <b-button
+              v-b-popover.hover.top="'Adicionar processo'"
+              size="sm"
+              class="mr-1 button-bar"
+              v-b-modal="'myModalProcess'"
+            >
+              <i class="fas fa-plus "></i>
             </b-button>
-            <b-button size="sm" variant="outline-info" class="mr-2" v-b-modal="'myModalProcess'">
-              <i class="fas fa-search"></i>
-              Pesquisar
+            <b-button
+              v-b-popover.hover.top="'Pesquisar processo'"
+              size="sm"
+              class="mr-1 button-bar"
+              v-b-modal="'myModalProcess'"
+            >
+              <i class="fas fa-search "></i>
             </b-button>
 
             <b-button
+              v-b-popover.hover.top="'Atribuir processo(s)'"
               size="sm"
-              variant="outline-dark"
               v-if="selectedProcesses.length"
-              class="mr-2"
+              class="mr-1 button-bar"
               v-b-modal="'myModalAssign'"
             >
               <i class="fas fa-share"></i>
-              <i class="fas fa-user-check"></i>
-              Atribuir
+              <i class="fas fa-user-check "></i>
             </b-button>
 
             <b-button
+              v-b-popover.hover.top="'Tramitar processo(s)'"
               size="sm"
-              variant="outline-dark"
               v-if="selectedProcesses.length"
-              class="mr-2"
+              class="mr-1 button-bar"
               v-b-modal="'myModalSend'"
             >
               <i class="fas fa-share"></i>
-              <i class="fas fa-sitemap"></i>
-              Tramitar
+              <i class="fas fa-sitemap "></i>
             </b-button>
 
             <b-button
               size="sm"
-              variant="outline-danger"
+              variant="link"
               @click="selectedProcesses=[]"
               v-if="selectedProcesses.length"
-              class="mr-2"
+              class="mr-1"
             >
               <i class="fas fa-times mr-1"></i>
               Limpar seleção de {{ (selectedProcesses.length) ? selectedProcesses.length : '0' }} processo(s)
@@ -413,7 +419,7 @@
             v-b-modal="'myModalProcess'"
             variant="danger"
             class="ml-1"
-            @click.prevent="loadResource(data.item, 'edit')"
+            @click.prevent="getResource(data.item, 'edit')"
           >
             <i class="far fa-edit" title="Editar o registro."></i>
           </a>
@@ -422,7 +428,7 @@
             v-b-modal="'myModalProcess'"
             variant="danger"
             class="ml-1"
-            @click.prevent="loadResource(data.item, 'remove')"
+            @click.prevent="getResource(data.item, 'remove')"
             style="color:red"
           >
             <i class="far fa-trash-alt" title="Excluir o registro."></i>
@@ -590,32 +596,32 @@ export default {
     clickModalSend() {
       this.modalShowSend = false;
     },
-    loadUsers() {
+    getUsers() {
       const url = `${baseApiUrl}/users/assign`;
       axios.get(url).then(res => {
         this.users = res.data;
       });
     },
-    loadDivisions(tenant) {
+    getDivisions(tenant) {
       const url = `${baseApiUrl}/divisions?tenant=${tenant}`;
       axios.get(url).then(res => {
         this.divisions = res.data;
       });
     },
-    loadDemands(tenant) {
+    getDemands(tenant) {
       const url = `${baseApiUrl}/demands?tenant=${tenant}`;
       axios.get(url).then(res => {
         this.demands = res.data;
       });
     },
-    loadResources() {
+    getResources() {
       const url = `${baseApiUrl}/processes`;
       axios.get(url).then(res => {
         this.processes = res.data;
         this.totalRows = res.data.length;
       });
     },
-    loadResource(process, mode) {
+    getResource(process, mode) {
       this.process = { requester: { person: "PJ" } };
       this.mode = mode;
       const url = `${baseApiUrl}/processes/${process._id}`;
@@ -847,15 +853,15 @@ export default {
     firstForm() {
       this.clickModalProcess();
       this.mode = "save";
-      this.loadResources();
+      this.getResources();
       this.process = {};
       this.process = {
         requester: {
           person: "PJ"
         }
       };
-      this.loadDivisions(this.user.tenant);
-      this.loadDemands(this.user.tenant);
+      this.getDivisions(this.user.tenant);
+      this.getDemands(this.user.tenant);
     },
 
     receive(process) {
@@ -897,7 +903,7 @@ export default {
         .post(`${baseApiUrl}/processes/send`, this.send)
         .then(() => {
           this.selectedProcesses = [];
-          this.loadResources();
+          this.getResources();
           this.clickModalSend();
         })
         .catch();
@@ -915,19 +921,26 @@ export default {
         .post(`${baseApiUrl}/processes/assign`, this.assign)
         .then(() => {
           this.selectedProcesses = [];
-          this.loadResources();
+          this.getResources();
           this.clickModalAssign();
         })
         .catch();
     }
   },
-  
+
   mounted() {
     this.firstForm();
-    this.loadUsers();
+    this.getUsers();
   }
 };
 </script>
 
 <style>
+.button-bar {
+  color: #555;
+  width: 50px;
+  height: 40px;
+  border-radius: 2px;
+  background-color: white;
+}
 </style>

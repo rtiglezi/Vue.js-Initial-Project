@@ -4,6 +4,33 @@
 
     <b-modal
       v-bind:hide-footer="true"
+      id="myModalSend"
+      v-model="modalShowSend"
+      title="Tramitação de processos"
+    >
+      Tramitar o processo à Unidade:
+      <b-form-select @change="sendProcessesToDivision($event)">
+        <option
+          v-for="division in divisions"
+          :value="division._id"
+          :key="division._id"
+        >{{division.name}}</option>
+      </b-form-select>
+
+      <br />
+      <br />
+
+      <div class="text-right">
+        <b-button @click="fncSend()" class="btn-main ml-2">
+          <i class="fa fa-send"></i>
+          Tramitar
+        </b-button>
+        <b-button class="ml-2" variant="secondary" @click="clickModalSend()">Cancelar</b-button>
+      </div>
+    </b-modal>
+
+    <b-modal
+      v-bind:hide-footer="true"
       id="myModalAssign"
       v-model="modalShowAssign"
       title="Atribuição de processos"
@@ -23,7 +50,6 @@
         </b-button>
         <b-button class="ml-2" variant="secondary" @click="clickModalAssign()">Cancelar</b-button>
       </div>
-
     </b-modal>
 
     <b-modal
@@ -113,9 +139,24 @@
             <b-col md="4">Unidade:</b-col>
             <b-col md="8">{{process.divisionName}}</b-col>
           </b-row>
+
+         
+
           <b-row>
-            <b-col md="4">Localidade:</b-col>
-            <b-col md="8">{{process.city}}/{{process.state}}</b-col>
+            <b-col md="4">Atribuição:</b-col>
+            <b-col md="8">{{process.userName}}</b-col>
+          </b-row>
+
+          <b-row>
+            <b-col md="4">Etapa atual:</b-col>
+            <b-col md="8">
+              <div v-for="stage in stages" :key="stage" :value="stages">
+                <div
+                  style="color: brown; font-weight: bold"
+                  v-if="process.progresses[process.progresses.length-1].stage == stage._id"
+                >{{stage.name.toUpperCase()}}</div>
+              </div>
+            </b-col>
           </b-row>
         </b-card>
       </b-col>
@@ -133,34 +174,67 @@
             <b-col md="2">Documento:</b-col>
             <b-col md="10">{{ process.requesterPerson }} - {{ process.requesterDocument }}</b-col>
           </b-row>
+           <b-row>
+            <b-col md="2">Localidade:</b-col>
+            <b-col md="10">{{process.city}}/{{process.state}}</b-col>
+          </b-row>
         </b-card>
       </b-col>
     </b-row>
 
-    <b-button size="sm" variant="outline-dark" class="mr-2 mb-2" v-b-modal="'myModalAssign'">
-      <i class="fas fa-share"></i>
-      <i class="fas fa-user-check"></i>
-      Atribuir
-    </b-button>
-
-    <b-card class="mb-2" style="background-color:#DDD; text-align: center">
-      <b-button variant="link" size="small" v-b-toggle.collapse-3 class="m-2" style="color:black">
-        Última etapa:
-        <span
-          v-if="stages[currentStagePosition-1]"
-        >{{ stages[currentStagePosition-1].name }}</span>
-        (+ detalhes)
+    <div class="text-center">
+      <b-button
+        v-b-popover.hover.top="'Atualizar o andamento'"
+        size="sm"
+        class="button-bar mr-1 mb-2"
+        @click="newStage()"
+        v-b-modal.modal-1
+      >
+        <i class="fas fa-flag"></i>
       </b-button>
 
       <b-button
-        variant="success"
-        size="small"
-        v-b-modal.modal-1
+        v-b-popover.hover.top="'Ver atual andamento'"
+        size="sm"
+        v-b-toggle.collapse-3
+        class="button-bar mr-1 mb-2"
         @click="newStage()"
-        class="m-2"
-      >Atualizar o andamento do processo</b-button>
+      >
+        <i class="fas fa-check-double"></i>
+      </b-button>
 
-      <b-collapse id="collapse-3">
+      <b-button
+        v-b-popover.hover.top="'Atribuir'"
+        size="sm"
+        class="button-bar mr-1 mb-2"
+        v-b-modal="'myModalAssign'"
+      >
+        <i class="fas fa-share"></i>
+        <i class="fas fa-user-check"></i>
+      </b-button>
+
+      <b-button
+        v-b-popover.hover.top="'Tramitar'"
+        size="sm"
+        class="button-bar mr-1 mb-2"
+        v-b-modal="'myModalSend'"
+      >
+        <i class="fas fa-share"></i>
+        <i class="fas fa-sitemap"></i>
+      </b-button>
+
+      <b-button
+        v-b-popover.hover.top="'Listar todos os processos'"
+        size="sm"
+        class="button-bar mr-1 mb-2"
+        @click="navigate('/processes')"
+      >
+        <i class="fab fa-buffer fa-lg"></i>
+      </b-button>
+    </div>
+
+    <b-collapse id="collapse-3">
+      <b-card class="mb-2" style="background-color:yellow; text-align: center">
         <div class="mt-2 mb-2">
           <b-row>
             <b-col
@@ -194,10 +268,10 @@
             </b-col>
           </b-row>
         </div>
-      </b-collapse>
-    </b-card>
+      </b-card>
+    </b-collapse>
 
-    <div class="layer-total">Histórico de ocorrências do processo</div>
+    <div class="layer-total">Histórico de ocorrências</div>
 
     <b-table id="my-table" :items="allProgresses" bordered responsive small :fields="items">
       <template slot="arrayStages" slot-scope="row">
@@ -212,7 +286,7 @@
           style="color:#888"
         >[{{ row.item.stage}}]</div>
         <div v-for="(item,index) in row.item.arrayStages" :key="item._id" :index="index">
-          <div style="color:black; font-weight:bold" v-if="item._id === row.item.stage">
+          <div style="font-weight:bold" v-if="item._id === row.item.stage">
             <i class="fas fa-flag mr-1"></i>
             {{ item.name}}
           </div>
@@ -246,13 +320,16 @@ export default {
   data: function() {
     return {
       modalShowAssign: false,
+      modalShowSend: false,
       assign: {},
+      send: {},
       currentStagePosition: null,
       modalShow: false,
       mode: "save",
       process: {},
       stages: [],
       users: [],
+      divisions: [],
       stage: {},
       results: [],
       progress: {},
@@ -387,7 +464,7 @@ export default {
           this.obj
         )
         .then(() => {
-          this.loadInitialData();
+          this.getInitialData();
           this.clickModalBtn();
           this.$toasted.global.defaultSuccess({
             msg: `Registro inserido com sucesso.`
@@ -420,7 +497,11 @@ export default {
         });
     },
 
-    loadStages(demandId) {
+    navigate(link) {
+      this.$router.push(link);
+    },
+
+    getStages(demandId) {
       const url = `${baseApiUrl}/demands/${demandId}/stages`;
       axios.get(url).then(res => {
         this.stages = res.data;
@@ -433,10 +514,22 @@ export default {
       this.results = st[0].results;
     },
 
-    loadInitialData() {
-      this.process = this.$route.params.process;
-      this.getProgresses(this.process._id);
-      this.loadStages(this.process.demandId);
+    sendProcessesToDivision(division) {
+      this.send = {
+        divisionId: division,
+        processesId: [this.process._id]
+      };
+    },
+
+    fncSend() {
+      axios
+        .post(`${baseApiUrl}/processes/send`, this.send)
+        .then(() => {
+          this.selectedProcesses = [];
+          this.clickModalSend();
+          this.getInitialData();
+        })
+        .catch();
     },
 
     assignProcessesToUser(user) {
@@ -451,7 +544,7 @@ export default {
         .post(`${baseApiUrl}/processes/assign`, this.assign)
         .then(() => {
           this.clickModalAssign();
-          this.loadInitialData();
+          this.getInitialData();
         })
         .catch();
     },
@@ -460,17 +553,43 @@ export default {
       this.modalShowAssign = false;
     },
 
-    loadUsers() {
+    clickModalSend() {
+      this.modalShowSend = false;
+    },
+
+    getUsers() {
       const url = `${baseApiUrl}/users/assign`;
       axios.get(url).then(res => {
         this.users = res.data;
       });
+    },
+
+    getDivisions() {
+      const url = `${baseApiUrl}/divisions`;
+      axios.get(url).then(res => {
+        this.divisions = res.data;
+      });
+    },
+
+    getProcess(id) {
+      const url = `${baseApiUrl}/processes/${id}`;
+      axios.get(url).then(res => {
+        this.process = res.data[0];
+      });
+    },
+
+    getInitialData() {
+      this.getProcess(this.$route.params.process._id);
+      this.getProgresses(this.$route.params.process._id);
+      this.getStages(this.$route.params.process.demandId[0]);
+      this.getDivisions();
     }
   },
 
   mounted() {
-    this.loadInitialData();
-    this.loadUsers();
+    !this.$route.params.process ? this.$router.push("/processes") : "";
+    this.getInitialData();
+    this.getUsers();
   }
 };
 </script>
