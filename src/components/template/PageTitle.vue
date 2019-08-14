@@ -5,8 +5,6 @@
         <img src="@/assets/c-proc.png" alt="Logo" width="30" />ceproc
       </b-navbar-brand>
 
-     
-
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
@@ -53,7 +51,16 @@
           <b-nav-form class="mr-3">
             <span style="color: #eee" class="mr-2">Pesquisar:</span>
 
-            <b-form-input size="sm" placeholder="número do processo..."></b-form-input>
+
+            <b-form v-on:submit.prevent v-on:keyup.enter="emitToParent(number)">
+      
+            <b-form-input
+              v-model="number"
+              size="sm"
+              placeholder="número do processo..."
+            ></b-form-input>
+
+            </b-form>
 
             <b-button
               size="sm"
@@ -61,6 +68,7 @@
               variant="danger"
               class="ml-1"
               v-b-popover.hover.top="'Pesquisar processo digitado'"
+              @click="emitToParent(number)"
             >
               <i class="fas fa-search"></i>
             </b-button>
@@ -69,14 +77,13 @@
               size="sm"
               style="border-style: solid; border-color: #ffffff9e; border-size: 1px; background-color: red"
               v-b-popover.hover.top="'Listar todas os processos'"
-              @click="navigate('/processes')"
+              @click="emitToParent('')"
               class="ml-1"
             >
               <i class="fab fa-buffer fa-lg"></i>
             </b-button>
 
-
-             <b-form-select
+            <b-form-select
               size="sm"
               v-b-popover.hover.top="'Trocar a unidade atual'"
               id="input-horizontal"
@@ -109,7 +116,6 @@
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
-
   </div>
 </template>
 
@@ -125,18 +131,23 @@ export default {
   computed: mapState(["user"]),
   data: function() {
     return {
-      divisions: []
+      divisions: [],
+      number: "",
+      processes: []
     };
   },
   methods: {
+    
     navigate(link) {
       this.$router.push(link);
     },
+
     logout() {
       localStorage.removeItem(userKey);
       this.$store.commit("setUser", null);
       this.$router.push({ name: "auth" });
     },
+
     getClass(main, button) {
       if (main == button) {
         return "isThePageClass";
@@ -144,12 +155,14 @@ export default {
         return "isNotThePageClass";
       }
     },
+    
     loadDivisions() {
       const url = `${baseApiUrl}/divisions`;
       axios.get(url).then(res => {
         this.divisions = res.data;
       });
     },
+
     changeDivision(division) {
       let userObj = {
         lastDivision: division
@@ -158,7 +171,19 @@ export default {
       axios.patch(url, userObj).then(() => {
         this.navigate("/redirection/division");
       });
+    },
+
+     emitToParent (number) {
+      this.$router.push({ name: "process", params: { number } });
+      this.$emit('childToParent', number)
+      this.number = '';
+    },
+
+    showValue() {
+      alert(this.number)
     }
+
+
   },
   mounted() {
     if (this.user) {

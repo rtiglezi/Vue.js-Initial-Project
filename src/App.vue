@@ -116,6 +116,7 @@ body {
   color: black;
   font-size: .8em;
   font-weight: 100;
+  white-space: nowrap;
 }
 .table-td {
   background-color: white;

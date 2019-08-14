@@ -101,6 +101,12 @@
         bordered
         :fields="items"
       >
+
+       <template
+          slot="created_at"
+          slot-scope="row"
+        >{{ row.item.created_at | moment("DD/MM/YYYY HH:MM") }}</template>
+    
         
 
         <template slot="actions" slot-scope="data">

@@ -1,83 +1,107 @@
 <template>
-  <div class="tenant-admin">
+  <div class="process">
     <Header title="[e-Proc 2]" />
 
-    <PageTitle main="processes" />
+    <PageTitle v-on:childToParent="onChildClick" main="processes" />
 
     <b-modal
       v-model="modalShow"
       size="lg"
       v-bind:hide-footer="true"
       id="modal-1"
-      style="color: red; font-weight: bold"
+      style="font-weight: bold"
       title="Registro coletivo de andamento nos processos selecionados."
     >
-      <div style="font-size: .8em">
-      Atenção!!!<br> 
-      Você está realizando um registro coletivo em {{selectedProcesses.length}} processo(s).<br>
-      Tenha em mente que cada um dos processos selecionados terá seus atual andamento alterado.<br>
-      Antes de continuar, tenha certeza de que todos os processos selecionados devem ter ser alterados para a mesma etapa.
-      <hr>
-      </div>
-
-      <!-- INICIO FORMULÁRIO DE CADASTRO -->
-      <b-form v-on:submit.prevent="onSubmit">
-        <b-row>
-          <b-col style="color: red" md="4" sm="12" class="box-ico"></b-col>
-        </b-row>
-        <b-row>
-          <b-col md="6">
-            <b-form-group
-              id="fieldset-etapa"
-              label="Etapa a ser registrada:"
-              label-for="etapa"
-              description="Etapa que você acabou de realizar."
-            >
-              <b-form-select id="etapa" v-model="obj.stageId" @change="chooseResults($event)">
-                <option v-for="stage in stages" :value="stage._id" :key="stage._id">{{stage.name}}</option>
-              </b-form-select>
-            </b-form-group>
-          </b-col>
-          <b-col md="6">
-            <b-form-group
-              v-if="results.length > 0"
-              id="fieldset-resultado"
-              label="Resultado gerado:"
-              label-for="resultado"
-              description="Informe qual foi o resultado gerado."
-            >
-              <b-form-select id="resultado" v-model="obj.stageResultId">
-                <option
-                  v-for="result in results"
-                  :value="result._id"
-                  :key="result._id"
-                >{{result.name}}</option>
-              </b-form-select>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col>
-            <b-form-group
-              id="fieldset-ocorrencia"
-              label="Ocorrência:"
-              label-for="ocorrência"
-              description="Faça um breve relato da ocorrência"
-            >
-              <b-form-textarea rows="5" max-rows="5" class="input-text" id="ocorrencia" v-model="obj.occurrence"></b-form-textarea>
-            </b-form-group>
-          </b-col>
-        </b-row>
-
-        <div class="text-right">
-          <b-button variant="danger" class="ml-2" @click="saveProgress">
-            <i class="fa fa-check fa-lg"></i>
-            Registrar Andamento no(s) {{selectedProcesses.length}} processo(s)
-          </b-button>
-          <b-button class="ml-2" variant="secondary" @click="clickModalBtn()">Cancelar</b-button>
+      <div v-if="allowSend && stagesSelectBox.length>0">
+        <div style="color: red">
+          Atenção!!! Você está realizando registro coletivo em {{selectedProcesses.length}} processo(s).
+          <br />Tenha em mente que cada um dos processos selecionados terá seu atual andamento atualizado.
+          <br />Antes de continuar, tenha certeza de que todos os processos selecionados devem ser mesmo alterados.
+          <hr />
         </div>
-      </b-form>
-      <!-- FINAL FORMULÁRIO DE CADASTRO -->
+
+        <!-- INICIO FORMULÁRIO DE CADASTRO -->
+        <b-form v-on:submit.prevent="onSubmit">
+          <b-row>
+            <b-col style="color: red" md="4" sm="12" class="box-ico"></b-col>
+          </b-row>
+          <b-row>
+            <b-col md="6">
+              <b-form-group
+                id="fieldset-etapa"
+                label="Etapa a ser registrada:"
+                label-for="etapa"
+                description="Etapa que você acabou de realizar."
+              >
+                <b-form-select id="etapa" v-model="obj.stageId" @change="chooseResults($event)">
+                  <option
+                    v-for="stage in stagesSelectBox"
+                    :value="stage._id"
+                    :key="stage._id"
+                    v-show="stage != stages[0]"
+                  >{{stage.name}}</option>
+                </b-form-select>
+              </b-form-group>
+            </b-col>
+            <b-col md="6">
+              <b-form-group
+                v-if="results.length > 0"
+                id="fieldset-resultado"
+                label="Resultado gerado:"
+                label-for="resultado"
+                description="Informe qual foi o resultado gerado."
+              >
+                <b-form-select id="resultado" v-model="obj.stageResultId">
+                  <option
+                    v-for="result in results"
+                    :value="result._id"
+                    :key="result._id"
+                  >{{result.name}}</option>
+                </b-form-select>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col>
+              <b-form-group
+                id="fieldset-ocorrencia"
+                label="Ocorrência:"
+                label-for="ocorrência"
+                description="Faça um breve relato da ocorrência"
+              >
+                <b-form-textarea
+                  rows="5"
+                  max-rows="5"
+                  class="input-text"
+                  id="ocorrencia"
+                  v-model="obj.occurrence"
+                ></b-form-textarea>
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <div class="text-right">
+            <b-button variant="danger" class="ml-2" @click="saveProgress">
+              <i class="fa fa-check fa-lg"></i>
+              Registrar o andamento no(s) {{selectedProcesses.length}} processo(s)
+            </b-button>
+            <b-button class="ml-2" variant="secondary" @click="clickModalBtn()">Cancelar</b-button>
+          </div>
+        </b-form>
+      </div>
+      <div v-else>
+        Não é possível prosseguir.
+        <div v-if="!allowSend">
+          Os processos selecionados são demandas diferentes.
+          <br />Por favor, selecione apenas processos pertencentes a mesma demanda.
+        </div>
+        <div v-if="stagesSelectBox.length==0">
+          Não há nenhuma etapa planejada para a demanda do(s) processo(s) selecionado(s).
+          <br />Por favor, fale com o administrador para adicionar as etapas dessa demanda.
+        </div>
+        <hr />
+        <b-button class="ml-2" variant="secondary" @click="clickModalBtn()">Fechar</b-button>
+      </div>
     </b-modal>
 
     <b-modal
@@ -430,7 +454,7 @@
               size="sm"
               class="button-bar mr-1"
               v-b-modal.modal-1
-              @click="getStages(processes[0].demandId[0])"
+              @click="getStages()"
             >
               <i class="fas fa-flag"></i>
             </b-button>
@@ -464,6 +488,11 @@
         small
         :fields="items"
       >
+        <template
+          slot="updated_at"
+          slot-scope="row"
+        >{{ row.item.updated_at | moment("DD/MM/YYYY HH:MM") }}</template>
+
         <template slot="progresses" slot-scope="row">
           <div v-for="(item, index) in row.item.progresses" :index="index" :key="item._id">
             <div
@@ -565,7 +594,9 @@ export default {
       divisions: [],
       demands: [],
       stages: [],
+      stagesSelectBox: [],
       obj: {},
+      allowSend: true,
       results: [],
       users: [],
       assign: {},
@@ -577,6 +608,7 @@ export default {
         }
       },
       processes: [],
+      number: "",
       totalRows: 1,
       filter: null,
       currentPage: 1,
@@ -602,7 +634,7 @@ export default {
         },
         {
           key: "divisionName",
-          label: "Unidade:",
+          label: "Unidade",
           sortable: true,
           class: "text-left",
           thClass: "table-th",
@@ -737,25 +769,20 @@ export default {
     },
 
     saveProgress() {
-      let index = 0
+      let index = 0;
       this.selectedProcesses.map(r => {
-
-         axios
-           .patch(
-             `${baseApiUrl}/processes/${r}/updateprgrs`,
-             this.obj
-           )
-           .then(() => {
-          
-              index++;
-             this.getResources();
-             this.$toasted.global.defaultSuccess({
-               msg: `${index}&#176; andamento realizado com sucesso.`
-             });
-              this.selectedProcesses = [];
-              this.clickModalBtn();
-              })
-           .catch();
+        axios
+          .patch(`${baseApiUrl}/processes/${r}/updateprgrs`, this.obj)
+          .then(() => {
+            index++;
+            this.getResources();
+            this.$toasted.global.defaultSuccess({
+              msg: `${index}&#176; andamento realizado com sucesso.`
+            });
+            this.selectedProcesses = [];
+            this.clickModalBtn();
+          })
+          .catch();
       });
     },
 
@@ -1008,11 +1035,31 @@ export default {
       }
     },
 
-    getStages(demandId) {
-      const url = `${baseApiUrl}/demands/${demandId}/stages`;
-      axios.get(url).then(res => {
-        this.stages = res.data;
+    getStages() {
+      this.allowSend = true;
+      let demandId = null;
+
+      this.processes.map(r => {
+        if (this.allowSend) {
+          if (this.selectedProcesses.indexOf(r._id) != -1) {
+            if (demandId == null) {
+              demandId = r.demandId;
+            }
+            if (r.demandId.toString() != demandId.toString()) {
+              this.allowSend = false;
+            }
+          }
+        }
       });
+
+      if (this.allowSend) {
+        const url = `${baseApiUrl}/demands/${demandId}/stages`;
+        axios.get(url).then(res => {
+          this.stages = res.data;
+          this.stagesSelectBox = this.stages.slice();
+          this.stagesSelectBox.splice(0, 1);
+        });
+      }
     },
 
     chooseResults(stage) {
@@ -1055,13 +1102,21 @@ export default {
           this.clickModalAssign();
         })
         .catch();
+    },
+
+    onChildClick(value) {
+      const url = `${baseApiUrl}/processes?number=${value}`;
+      axios.get(url).then(res => {
+        this.processes = res.data;
+        this.totalRows = res.data.length;
+        this.selectedProcesses = [];
+      });
     }
   },
 
   mounted() {
     this.firstForm();
     this.getUsers();
-    
   }
 };
 </script>

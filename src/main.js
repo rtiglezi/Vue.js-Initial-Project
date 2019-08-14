@@ -17,6 +17,7 @@ import VueDraggable from "vue-draggable";
 import VueTheMask from 'vue-the-mask'
 
 
+
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Menu from 'primevue/menu';
@@ -38,6 +39,7 @@ import 'primevue/resources/themes/nova-light/theme.css';
 import 'primevue/resources/primevue.min.css';
 import 'primeicons/primeicons.css';
 
+Vue.use(require('vue-moment'));
 
 
 Vue.use(VueTheMask)

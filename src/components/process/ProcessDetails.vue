@@ -74,8 +74,12 @@
               description="Etapa que você acabou de realizar."
             >
               <b-form-select id="etapa" v-model="obj.stageId" @change="chooseResults($event)">
-                <option v-for="stage in stages" :value="stage._id" :key="stage._id">{{stage.name}}</option>
-              </b-form-select>
+                  <option
+                    v-for="stage in stagesSelectBox"
+                    :value="stage._id"
+                    :key="stage._id"
+                  >{{stage.name}}</option>
+                </b-form-select>
             </b-form-group>
           </b-col>
           <b-col md="6">
@@ -137,14 +141,12 @@
 
           <b-row>
             <b-col md="4">Unidade:</b-col>
-            <b-col md="8">{{process.divisionName}}</b-col>
+            <b-col md="8">{{process.divisionName.toString()}}</b-col>
           </b-row>
-
-         
 
           <b-row>
             <b-col md="4">Atribuição:</b-col>
-            <b-col md="8">{{process.userName}}</b-col>
+            <b-col md="8">{{process.userName.toString()}}</b-col>
           </b-row>
 
           <b-row>
@@ -164,7 +166,7 @@
         <b-card class="mb-2">
           <b-row>
             <b-col md="2">Demanda:</b-col>
-            <b-col md="10">{{process.demandName}}</b-col>
+            <b-col md="10">{{process.demandName.toString()}}</b-col>
           </b-row>
           <b-row>
             <b-col md="2">Solicitante:</b-col>
@@ -174,7 +176,7 @@
             <b-col md="2">Documento:</b-col>
             <b-col md="10">{{ process.requesterPerson }} - {{ process.requesterDocument }}</b-col>
           </b-row>
-           <b-row>
+          <b-row>
             <b-col md="2">Localidade:</b-col>
             <b-col md="10">{{process.city}}/{{process.state}}</b-col>
           </b-row>
@@ -274,6 +276,11 @@
     <div class="layer-total">Histórico de ocorrências</div>
 
     <b-table id="my-table" :items="allProgresses" bordered responsive small :fields="items">
+      <template
+        slot="updated_at"
+        slot-scope="row"
+      >{{ row.item.updated_at | moment("DD/MM/YYYY HH:MM") }}</template>
+
       <template slot="arrayStages" slot-scope="row">
         <div
           v-if="
@@ -328,6 +335,7 @@ export default {
       mode: "save",
       process: {},
       stages: [],
+      stagesSelectBox: [],
       users: [],
       divisions: [],
       stage: {},
@@ -341,41 +349,41 @@ export default {
       items: [
         {
           key: "updated_at",
-          label: "Data Ocorrência",
+          label: "Data/hora:",
           sortable: true,
-          class: "text-center",
+          class: "text-left",
           thClass: "table-th2",
           tdClass: "table-td"
         },
         {
           key: "userName",
-          label: "Realizada por:",
+          label: "Responsável:",
           sortable: true,
-          class: "text-center",
+          class: "text-left",
           thClass: "table-th2",
           tdClass: "table-td"
         },
         {
           key: "divisionName",
-          label: "Na unidade:",
+          label: "Unidade:",
           sortable: true,
-          class: "text-center",
+          class: "text-left",
           thClass: "table-th2",
           tdClass: "table-td"
         },
         {
           key: "arrayStages",
-          label: "Ocorrência",
+          label: "Ocorrência:",
           sortable: true,
-          class: "text-center",
+          class: "text-left",
           thClass: "table-th2",
           tdClass: "table-td"
         },
         {
           key: "occurrence",
-          label: "Observações sobre a ocorrência",
+          label: "Observações sobre a ocorrência:",
           sortable: true,
-          class: "text-center",
+          class: "text-left",
           thClass: "table-th2",
           tdClass: "table-td"
         }
@@ -505,6 +513,8 @@ export default {
       const url = `${baseApiUrl}/demands/${demandId}/stages`;
       axios.get(url).then(res => {
         this.stages = res.data;
+        this.stagesSelectBox = this.stages.slice()
+        this.stagesSelectBox.splice(0,1)
       });
     },
 

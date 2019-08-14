@@ -201,6 +201,11 @@
         responsive
         small
         :fields="items">
+
+        <template
+          slot="created_at"
+          slot-scope="row"
+        >{{ row.item.created_at | moment("DD/MM/YYYY HH:MM") }}</template>
     
 
         <template slot="tenantDetails" slot-scope="row">

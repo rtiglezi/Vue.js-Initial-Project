@@ -120,6 +120,11 @@
         @filtered="onFiltered"
       >
 
+      <template
+          slot="created_at"
+          slot-scope="row"
+        >{{ row.item.created_at | moment("DD/MM/YYYY HH:MM") }}</template>
+
         <template slot="actions" slot-scope="data">
           <b-button v-b-modal="'mymodal'" @click="loadResource(data.item, 'edit')">
             <i class="fas fa-pen-square" title="Editar o registro."></i>
