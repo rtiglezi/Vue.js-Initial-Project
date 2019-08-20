@@ -169,11 +169,28 @@
               <b-card class="box">
                 <b-row>
                   <b-col md="3" sm="12" class="box-ico">
-                    <i class="fa fa-th-list fa-5x" aria-hidden="true"></i>
-                    <br />Dados Cadastrais
+                    <i class="fab fa-buffer fa-5x" aria-hidden="true"></i>
+                    <br />Processo
                   </b-col>
                   <b-col md="9" sm="12">
-                    <b-form-group label="Número *" label-for="processNumber">
+                    <b-form-group label="Data do protocolo *" label-for="processProtocolDate">
+                      <b-form-input
+                        type="date"
+                        ref="processProtocolDate"
+                        name="Data"
+                        id="processProtocolDate"
+                        class="input-text"
+                        :value="today"
+                        :readonly="mode === 'remove'"
+                        v-validate="{ required: true, min: 3 }"
+                      ></b-form-input>
+                      <span
+                        ref="spnProtocolDate"
+                        v-if="showSpanError('Data')"
+                        class="adm-msg-error"
+                      >{{ errors.first('Data') }}</span>
+                    </b-form-group>
+                    <b-form-group label="Número do Processo *" label-for="processNumber">
                       <b-form-input
                         v-mask="'#####.######/####-##'"
                         ref="processNumber"
@@ -239,7 +256,7 @@
               <b-card class="box">
                 <b-row>
                   <b-col md="3" sm="12" class="box-ico">
-                    <i class="fas fa-user-tie fa-5x" aria-hidden="true"></i>
+                    <i :class="getIconRequester(process.requester.person)" aria-hidden="true"></i>
                     <br />Solicitante
                   </b-col>
 
@@ -571,6 +588,8 @@
 </template>
 
 <script>
+import moment from "moment";
+
 import { baseApiUrl, showError } from "@/global";
 import axios from "axios";
 import PageTitle from "../template/PageTitle";
@@ -583,6 +602,7 @@ export default {
   components: { PageTitle },
   data: function() {
     return {
+      today: moment(new Date(), "YYYY-MM-DD").format("YYYY-MM-DD"),
       selectedProcesses: [],
       loading: false,
       modalShow: false,
@@ -747,11 +767,12 @@ export default {
       });
     },
     getResource(process, mode) {
-      this.process = { requester: { person: "PJ" } };
       this.mode = mode;
       const url = `${baseApiUrl}/processes/${process._id}`;
       axios.get(url).then(res => {
         this.process = res.data;
+        let td = res.data.protocolDate;
+        this.today = moment(td).format("YYYY-MM-DD");
       });
     },
     getStageName(demand, stage) {
@@ -986,6 +1007,16 @@ export default {
           return "Nome *";
         } else {
           return "Razão Social *";
+        }
+      }
+    },
+
+    getIconRequester(val) {
+      if (val) {
+        if (val == "PF") {
+          return "fa fa-user-tie fa-5x";
+        } else {
+          return "fa fa-building fa-5x";
         }
       }
     },

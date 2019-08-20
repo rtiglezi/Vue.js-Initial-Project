@@ -1,22 +1,16 @@
 import Vue from "vue";
 
-import VeeValidate from "vee-validate";
-import pt_BR from "vee-validate/dist/locale/pt_BR";
-
+import App from "./App";
 import "./config/bootstrap";
 import "./config/msgs";
 import "./config/axios";
-
-import App from "./App";
-
 import store from "./config/store";
 import router from "./config/router";
 
+import VeeValidate from "vee-validate";
+import pt_BR from "vee-validate/dist/locale/pt_BR";
 import VueDraggable from "vue-draggable";
-
 import VueTheMask from 'vue-the-mask'
-
-
 
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
@@ -40,8 +34,6 @@ import 'primevue/resources/primevue.min.css';
 import 'primeicons/primeicons.css';
 
 Vue.use(require('vue-moment'));
-
-
 Vue.use(VueTheMask)
 Vue.use(VueDraggable);
 

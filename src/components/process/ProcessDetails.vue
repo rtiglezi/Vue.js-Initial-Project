@@ -74,12 +74,12 @@
               description="Etapa que você acabou de realizar."
             >
               <b-form-select id="etapa" v-model="obj.stageId" @change="chooseResults($event)">
-                  <option
-                    v-for="stage in stagesSelectBox"
-                    :value="stage._id"
-                    :key="stage._id"
-                  >{{stage.name}}</option>
-                </b-form-select>
+                <option
+                  v-for="stage in stagesSelectBox"
+                  :value="stage._id"
+                  :key="stage._id"
+                >{{stage.name}}</option>
+              </b-form-select>
             </b-form-group>
           </b-col>
           <b-col md="6">
@@ -90,7 +90,7 @@
               label-for="resultado"
               description="Informe qual foi o resultado gerado."
             >
-              <b-form-select id="resultado" v-model="obj.stageResultId">
+              <b-form-select id="resultado" v-model="obj.resultId">
                 <option
                   v-for="result in results"
                   :value="result._id"
@@ -160,6 +160,18 @@
               </div>
             </b-col>
           </b-row>
+
+          <b-row>
+            <b-col md="4">Resultado:</b-col>
+            <b-col md="8">
+              <div v-for="stage in stages" :key="stage" :value="stages">
+                <div
+                  style="color: brown; font-weight: bold"
+                  v-if="process.progresses[process.progresses.length-1].stage == stage._id"
+                >{{stage.name.toUpperCase()}}</div>
+              </div>
+            </b-col>
+          </b-row>
         </b-card>
       </b-col>
       <b-col md="8">
@@ -186,7 +198,7 @@
 
     <div class="text-center">
       <b-button
-        v-b-popover.hover.top="'Atualizar o andamento'"
+        v-b-popover.hover.bottom="'Atualizar o andamento'"
         size="sm"
         class="button-bar mr-1 mb-2"
         @click="newStage()"
@@ -196,7 +208,7 @@
       </b-button>
 
       <b-button
-        v-b-popover.hover.top="'Ver atual andamento'"
+        v-b-popover.hover.bottom="'Ver atual andamento'"
         size="sm"
         v-b-toggle.collapse-3
         class="button-bar mr-1 mb-2"
@@ -206,7 +218,7 @@
       </b-button>
 
       <b-button
-        v-b-popover.hover.top="'Atribuir'"
+        v-b-popover.hover.bottom="'Atribuir'"
         size="sm"
         class="button-bar mr-1 mb-2"
         v-b-modal="'myModalAssign'"
@@ -216,7 +228,7 @@
       </b-button>
 
       <b-button
-        v-b-popover.hover.top="'Tramitar'"
+        v-b-popover.hover.bottom="'Tramitar'"
         size="sm"
         class="button-bar mr-1 mb-2"
         v-b-modal="'myModalSend'"
@@ -226,7 +238,7 @@
       </b-button>
 
       <b-button
-        v-b-popover.hover.top="'Listar todos os processos'"
+        v-b-popover.hover.bottom="'Listar todos os processos'"
         size="sm"
         class="button-bar mr-1 mb-2"
         @click="navigate('/processes')"
@@ -299,6 +311,17 @@
           </div>
         </div>
       </template>
+
+      <template slot="arrayResults" slot-scope="row">
+        <div v-for="(item,index) in row.item.arrayResults" :key="item._id" :index="index">
+          <div v-if="item.length > 0">
+            <div v-for="(itm, idx) in item" :key="itm._id" :index="idx">
+              <div v-if="itm._id === row.item.result">{{ itm.name }}</div>
+            </div>
+          </div>
+        </div>
+      </template>
+
       <template slot="occurrence" slot-scope="row">
         <div
           v-if="
@@ -374,6 +397,14 @@ export default {
         {
           key: "arrayStages",
           label: "Ocorrência:",
+          sortable: true,
+          class: "text-left",
+          thClass: "table-th2",
+          tdClass: "table-td"
+        },
+        {
+          key: "arrayResults",
+          label: "Resultado:",
           sortable: true,
           class: "text-left",
           thClass: "table-th2",
@@ -463,6 +494,7 @@ export default {
         stageName,
         action: "new"
       };
+
     },
 
     save() {
@@ -478,7 +510,9 @@ export default {
             msg: `Registro inserido com sucesso.`
           });
         })
-        .catch();
+        .catch(err => {
+          alert(err);
+        });
     },
 
     getProgresses(processId) {
@@ -513,8 +547,8 @@ export default {
       const url = `${baseApiUrl}/demands/${demandId}/stages`;
       axios.get(url).then(res => {
         this.stages = res.data;
-        this.stagesSelectBox = this.stages.slice()
-        this.stagesSelectBox.splice(0,1)
+        this.stagesSelectBox = this.stages.slice();
+        this.stagesSelectBox.splice(0, 1);
       });
     },
 
@@ -584,7 +618,7 @@ export default {
     getProcess(id) {
       const url = `${baseApiUrl}/processes/${id}`;
       axios.get(url).then(res => {
-        this.process = res.data[0];
+        this.process = res.data;
       });
     },
 
