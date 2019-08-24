@@ -19,6 +19,7 @@ import Fieldset from 'primevue/fieldset';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import OverlayPanel from 'primevue/overlaypanel';
+import MultiSelect from 'primevue/multiselect';
 
 
 Vue.component('InputText', InputText);
@@ -28,6 +29,7 @@ Vue.component('Fieldset', Fieldset);
 Vue.component('Accordion', Accordion);
 Vue.component('AccordionTab', AccordionTab);
 Vue.component('OverlayPanel', OverlayPanel);
+Vue.component('MultiSelect', MultiSelect);
 
 import 'primevue/resources/themes/nova-light/theme.css';
 import 'primevue/resources/primevue.min.css';

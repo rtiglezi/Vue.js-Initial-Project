@@ -501,9 +501,9 @@
         :items="processes"
         :per-page="perPage"
         :current-page="currentPage"
-        bordered
         responsive
         small
+        hover
         :fields="items"
       >
         <template
