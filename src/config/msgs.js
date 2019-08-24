@@ -21,7 +21,13 @@ Vue.toasted.register(
 )
 
 Vue.toasted.register(
-    'defaultConfirm', 
+    'defaultInfo', 
     payload => !payload.msg ? 'Tudo certo! Pode prosseguir.' : payload.msg,
     { type: 'info', icon: 'info' }
+)
+
+Vue.toasted.register(
+    'defaultWarning', 
+    payload => !payload.msg ? 'Tudo certo! Pode prosseguir.' : payload.msg,
+    { type: 'warning', icon: 'warning' }
 )

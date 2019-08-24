@@ -14,6 +14,7 @@
           v-for="division in divisions"
           :value="division._id"
           :key="division._id"
+          :disabled="division._id == user.lastDivision"
         >{{division.name}}</option>
       </b-form-select>
 
@@ -84,7 +85,7 @@
           </b-col>
           <b-col md="6">
             <b-form-group
-              v-if="results.length > 0"
+              v-if="results && results.length > 0"
               id="fieldset-resultado"
               label="Resultado gerado:"
               label-for="resultado"
@@ -141,33 +142,23 @@
 
           <b-row>
             <b-col md="4">Unidade:</b-col>
-            <b-col md="8">{{process.divisionName.toString()}}</b-col>
+            <b-col md="8">{{process.divisionName}}</b-col>
           </b-row>
 
           <b-row>
             <b-col md="4">Atribuição:</b-col>
-            <b-col md="8">{{process.userName.toString()}}</b-col>
+            <b-col md="8">
+              <span v-if="process.userName">{{process.userName.toString()}}</span>
+            </b-col>
           </b-row>
 
           <b-row>
             <b-col md="4">Etapa atual:</b-col>
             <b-col md="8">
-              <div v-for="stage in stages" :key="stage" :value="stages">
+              <div v-for="stage in stages" :key="stage._id" :value="stage.name">
                 <div
                   style="color: brown; font-weight: bold"
-                  v-if="process.progresses[process.progresses.length-1].stage == stage._id"
-                >{{stage.name.toUpperCase()}}</div>
-              </div>
-            </b-col>
-          </b-row>
-
-          <b-row>
-            <b-col md="4">Resultado:</b-col>
-            <b-col md="8">
-              <div v-for="stage in stages" :key="stage" :value="stages">
-                <div
-                  style="color: brown; font-weight: bold"
-                  v-if="process.progresses[process.progresses.length-1].stage == stage._id"
+                  v-if="process.progresses && process.progresses[process.progresses.length-1].stage == stage._id"
                 >{{stage.name.toUpperCase()}}</div>
               </div>
             </b-col>
@@ -178,7 +169,7 @@
         <b-card class="mb-2">
           <b-row>
             <b-col md="2">Demanda:</b-col>
-            <b-col md="10">{{process.demandName.toString()}}</b-col>
+            <b-col md="10">{{process.demandName}}</b-col>
           </b-row>
           <b-row>
             <b-col md="2">Solicitante:</b-col>
@@ -205,16 +196,6 @@
         v-b-modal.modal-1
       >
         <i class="fas fa-flag"></i>
-      </b-button>
-
-      <b-button
-        v-b-popover.hover.bottom="'Ver atual andamento'"
-        size="sm"
-        v-b-toggle.collapse-3
-        class="button-bar mr-1 mb-2"
-        @click="newStage()"
-      >
-        <i class="fas fa-check-double"></i>
       </b-button>
 
       <b-button
@@ -247,51 +228,13 @@
       </b-button>
     </div>
 
-    <b-collapse id="collapse-3">
-      <b-card class="mb-2" style="background-color:green; text-align: center">
-        <div class="mt-2 mb-2">
-          <b-row>
-            <b-col
-              class="mt-3 mb-3"
-              md="2"
-              sm="12"
-              v-for="(stage, index) in stages"
-              :index="index"
-              :key="stage._id"
-            >
-              <b-row>
-                <b-col md="10">
-                  <div v-for="(obj) in whoAmI(stages, index)" :key="obj">
-                    <b-card
-                      v-bind:style="{ 
-                      background: obj.dynamicOptions.background,
-                      color: obj.dynamicOptions.color,
-                      'text-align': 'center'
-                      }"
-                    >
-                      <span>{{ obj.stageName }}</span>
-                      <br />
-                      <i :class="obj.dynamicOptions.icon"></i>
-                    </b-card>
-                  </div>
-                </b-col>
-                <b-col md="2" class="arrow" v-if="index+1 < stages.length">
-                  <i class="fas fa-share"></i>
-                </b-col>
-              </b-row>
-            </b-col>
-          </b-row>
-        </div>
-      </b-card>
-    </b-collapse>
-
     <div class="layer-total">Histórico de ocorrências</div>
 
     <b-table id="my-table" :items="allProgresses" bordered responsive small :fields="items">
       <template
         slot="updated_at"
         slot-scope="row"
-      >{{ row.item.updated_at | moment("DD/MM/YYYY HH:MM") }}</template>
+      >{{ row.item.updated_at | moment("DD/MM/YYYY HH:mm") }}</template>
 
       <template slot="arrayStages" slot-scope="row">
         <div
@@ -314,10 +257,8 @@
 
       <template slot="arrayResults" slot-scope="row">
         <div v-for="(item,index) in row.item.arrayResults" :key="item._id" :index="index">
-          <div v-if="item.length > 0">
-            <div v-for="(itm, idx) in item" :key="itm._id" :index="idx">
-              <div v-if="itm._id === row.item.result">{{ itm.name }}</div>
-            </div>
+          <div v-for="(itm, idx) in item" :key="itm._id" :index="idx">
+            <div v-if="itm._id === row.item.result">{{ itm.name }}</div>
           </div>
         </div>
       </template>
@@ -344,8 +285,11 @@ import PageTitle from "../template/PageTitle";
 import { baseApiUrl } from "@/global";
 import axios from "axios";
 
+import { mapState } from "vuex";
+
 export default {
   name: "ProcessDetails",
+  computed: mapState(["user"]),
   components: { PageTitle },
   data: function() {
     return {
@@ -422,59 +366,50 @@ export default {
     };
   },
   methods: {
-    whoAmI(stages, index) {
-      let stagePosition = index + 1;
-      let stageId = stages[index]._id;
-      let stageName = stages[index].name;
-      let lastProgress = this.progresses[this.progresses.length - 1].stage;
-      let currentStage = false;
-
-      currentStage = stages[index]._id == lastProgress ? true : false;
-
-      this.currentStagePosition = currentStage
-        ? stagePosition
-        : this.currentStagePosition;
-
-      let whoAmI = {};
-      let dynamicOptions = {};
-
-      // etapas anteriores à corrente
-      if (stagePosition < this.currentStagePosition) {
-        dynamicOptions.background = "white";
-        dynamicOptions.color = "#555";
-        dynamicOptions.icon = "fas fa-check-circle fa-2x";
-      }
-
-      // etapa corrente
-      if (stagePosition == this.currentStagePosition) {
-        dynamicOptions.background = "white";
-        dynamicOptions.color = "red";
-        dynamicOptions.icon = "fas fa-check-circle fa-2x";
-      }
-
-      // etapas posteriores à próxima
-      if (stagePosition > this.currentStagePosition) {
-        dynamicOptions.background = "white";
-        dynamicOptions.color = "#888";
-        dynamicOptions.icon = "fas fa-clock fa-2x";
-      }
-
-      let obj = {
-        stageId,
-        stageName,
-        currentStage,
-        stagePosition,
-        currentStagePosition: this.currentStagePosition,
-        dynamicOptions: dynamicOptions
-      };
-
-      whoAmI.obj = obj;
-
-      return whoAmI;
-    },
-
     clickModalBtn() {
       this.modalShow = false;
+    },
+
+    getProgresses(processId) {
+      const url = `${baseApiUrl}/progresses?processId=${processId}`;
+      axios
+        .get(url)
+        .then(res => {
+          this.progresses = res.data;
+          if (res.data) {
+            this.totalRows = res.data.length;
+          }
+        })
+        .then(() => {
+          const url = `${baseApiUrl}/automatics?processId=${processId}`;
+          axios.get(url).then(res => {
+            this.automatics = res.data;
+            this.progresses = this.progresses.concat(this.automatics);
+
+            this.progresses.sort((a, b) =>
+              a.updated_at > b.updated_at ? 1 : -1
+            );
+
+            this.allProgresses = this.progresses.slice();
+            this.allProgresses = this.allProgresses.reverse();
+          });
+        });
+    },
+
+    getStages(demandId) {
+      const url = `${baseApiUrl}/demands/${demandId}/stages`;
+      axios.get(url).then(res => {
+        this.stages = res.data;
+        this.stagesSelectBox = this.stages.slice();
+        this.stagesSelectBox.splice(0, 1);
+      });
+    },
+
+    getDivisions() {
+      const url = `${baseApiUrl}/divisions`;
+      axios.get(url).then(res => {
+        this.divisions = res.data;
+      });
     },
 
     newStage() {
@@ -494,7 +429,6 @@ export default {
         stageName,
         action: "new"
       };
-
     },
 
     save() {
@@ -515,41 +449,8 @@ export default {
         });
     },
 
-    getProgresses(processId) {
-      const url = `${baseApiUrl}/progresses?processId=${processId}`;
-      axios
-        .get(url)
-        .then(res => {
-          this.progresses = res.data;
-          this.totalRows = res.data.length;
-        })
-        .then(() => {
-          const url = `${baseApiUrl}/automatics?processId=${processId}`;
-          axios.get(url).then(res => {
-            this.automatics = res.data;
-            this.progresses = this.progresses.concat(this.automatics);
-
-            this.progresses.sort((a, b) =>
-              a.updated_at > b.updated_at ? 1 : -1
-            );
-
-            this.allProgresses = this.progresses.slice();
-            this.allProgresses = this.allProgresses.reverse();
-          });
-        });
-    },
-
     navigate(link) {
       this.$router.push(link);
-    },
-
-    getStages(demandId) {
-      const url = `${baseApiUrl}/demands/${demandId}/stages`;
-      axios.get(url).then(res => {
-        this.stages = res.data;
-        this.stagesSelectBox = this.stages.slice();
-        this.stagesSelectBox.splice(0, 1);
-      });
     },
 
     chooseResults(stage) {
@@ -569,6 +470,9 @@ export default {
       axios
         .post(`${baseApiUrl}/processes/send`, this.send)
         .then(() => {
+          this.$toasted.global.defaultSuccess({
+            msg: `Trâmite realizado com sucesso.`
+          });
           this.selectedProcesses = [];
           this.clickModalSend();
           this.getInitialData();
@@ -587,6 +491,9 @@ export default {
       axios
         .post(`${baseApiUrl}/processes/assign`, this.assign)
         .then(() => {
+          this.$toasted.global.defaultSuccess({
+            msg: `Atribuição realizada com sucesso.`
+          });
           this.clickModalAssign();
           this.getInitialData();
         })
@@ -605,13 +512,6 @@ export default {
       const url = `${baseApiUrl}/users/assign`;
       axios.get(url).then(res => {
         this.users = res.data;
-      });
-    },
-
-    getDivisions() {
-      const url = `${baseApiUrl}/divisions`;
-      axios.get(url).then(res => {
-        this.divisions = res.data;
       });
     },
 

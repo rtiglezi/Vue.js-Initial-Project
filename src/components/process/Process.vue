@@ -2,7 +2,7 @@
   <div class="process">
     <Header title="[e-Proc 2]" />
 
-    <PageTitle v-on:childToParent="onChildClick" main="processes" />
+    <PageTitle v-on:childToParent="getResources" main="processes" />
 
     <b-modal
       v-model="modalShow"
@@ -116,6 +116,7 @@
           v-for="division in divisions"
           :value="division._id"
           :key="division._id"
+          :disabled="division._id == user.lastDivision"
         >{{division.name}}</option>
       </b-form-select>
 
@@ -444,6 +445,17 @@
             </b-button>
 
             <b-button
+              v-if="selectedProcesses.length"
+              v-b-popover.hover.top="'Atualizar o andamento'"
+              size="sm"
+              class="button-bar mr-1"
+              v-b-modal.modal-1
+              @click="getStages()"
+            >
+              <i class="fas fa-flag"></i>
+            </b-button>
+
+            <b-button
               v-b-popover.hover.top="'Atribuir processo(s)'"
               size="sm"
               v-if="selectedProcesses.length"
@@ -463,17 +475,6 @@
             >
               <i class="fas fa-share"></i>
               <i class="fas fa-sitemap"></i>
-            </b-button>
-
-            <b-button
-              v-if="selectedProcesses.length"
-              v-b-popover.hover.top="'Atualizar o andamento'"
-              size="sm"
-              class="button-bar mr-1"
-              v-b-modal.modal-1
-              @click="getStages()"
-            >
-              <i class="fas fa-flag"></i>
             </b-button>
 
             <b-button
@@ -508,7 +509,7 @@
         <template
           slot="updated_at"
           slot-scope="row"
-        >{{ row.item.updated_at | moment("DD/MM/YYYY HH:MM") }}</template>
+        >{{ row.item.updated_at | moment("DD/MM/YYYY HH:mm") }}</template>
 
         <template slot="progresses" slot-scope="row">
           <div v-for="(item, index) in row.item.progresses" :index="index" :key="item._id">
@@ -759,8 +760,57 @@ export default {
         this.demands = res.data;
       });
     },
-    getResources() {
-      const url = `${baseApiUrl}/processes`;
+    getResources(passedParam) {
+      //alert("passedParam=" + passedParam);
+      //alert("route.params=" + this.$route.params.passedParam);
+
+      if (!passedParam) {
+        passedParam = "all";
+        if (this.$route.params.passedParam) {
+          passedParam = undefined;
+        }
+      }
+
+      let url = "";
+      if (!passedParam && !this.$route.params.passedParam) {
+        url = `${baseApiUrl}/processes`;
+        this.$toasted.global.defaultInfo({
+          msg: `Listando todos os processos da unidade atual.`
+        });
+      } else {
+        if (passedParam) {
+          url = `${baseApiUrl}/processes?number=${passedParam}`;
+        } else {
+          if (this.$route.params.passedParam == "mine") {
+            url = `${baseApiUrl}/processes?user=${this.$route.params.passedParam}`;
+            this.$toasted.global.defaultInfo({
+              msg: `Listando os processos atribuídos a você.`
+            });
+          } else if (this.$route.params.passedParam == "all") {
+            url = `${baseApiUrl}/processes`;
+            this.$toasted.global.defaultInfo({
+              msg: `Listando todos os processos da unidade atual.`
+            });
+          } else {
+            url = `${baseApiUrl}/processes?number=${this.$route.params.passedParam}`;
+          }
+        }
+      }
+
+      if (passedParam == "all") {
+        url = `${baseApiUrl}/processes`;
+        this.$toasted.global.defaultInfo({
+          msg: `Listando todos os processos da unidade atual.`
+        });
+      }
+
+      if (passedParam == "mine") {
+        url = `${baseApiUrl}/processes?user=mine`;
+        this.$toasted.global.defaultInfo({
+          msg: `Listando os processos atribuídos a você.`
+        });
+      }
+
       axios.get(url).then(res => {
         this.processes = res.data;
         this.totalRows = res.data.length;
@@ -1110,6 +1160,9 @@ export default {
       axios
         .post(`${baseApiUrl}/processes/send`, this.send)
         .then(() => {
+          this.$toasted.global.defaultSuccess({
+            msg: `Trâmite realizado com sucesso.`
+          });
           this.selectedProcesses = [];
           this.getResources();
           this.clickModalSend();
@@ -1128,20 +1181,14 @@ export default {
       axios
         .post(`${baseApiUrl}/processes/assign`, this.assign)
         .then(() => {
+          this.$toasted.global.defaultSuccess({
+            msg: `Atribuição realizada com sucesso.`
+          });
           this.selectedProcesses = [];
           this.getResources();
           this.clickModalAssign();
         })
         .catch();
-    },
-
-    onChildClick(value) {
-      const url = `${baseApiUrl}/processes?number=${value}`;
-      axios.get(url).then(res => {
-        this.processes = res.data;
-        this.totalRows = res.data.length;
-        this.selectedProcesses = [];
-      });
     }
   },
 

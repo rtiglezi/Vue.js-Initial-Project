@@ -46,20 +46,35 @@
           </b-nav-item-dropdown>
         </b-navbar-nav>
 
+        <b-navbar-nav class="ml-3">
+          <b-nav-item-dropdown left>
+            <!-- Using 'button-content' slot -->
+            <template slot="button-content">
+              <i class="fa fa-folder admin-icon mr-1"></i>
+              <span style="color:#eee">Menu</span>
+            </template>
+            <b-dropdown-item
+              v-if="user.profiles.indexOf('master')!=-1"
+              href="#"
+              @click="navigate('/progresses')"
+            >
+              <i class="fa fa-th-list admin-icon"></i> Andamentos
+            </b-dropdown-item>
+          </b-nav-item-dropdown>
+        </b-navbar-nav>
+
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
           <b-nav-form class="mr-3">
-            <span style="color: #eee" class="mr-2">Pesquisar:</span>
+            <span style="color: #eee" class="mr-2">Pesquisa rápida de processo:</span>
 
-
-            <b-form v-on:submit.prevent v-on:keyup.enter="emitToParent(number)">
-      
-            <b-form-input
-              v-model="number"
-              size="sm"
-              placeholder="número do processo..."
-            ></b-form-input>
-
+            <b-form v-on:submit.prevent v-on:keyup.enter="emitNumberToParent(number)">
+              <b-form-input
+                v-model="number"
+                style="width:210px"
+                size="sm"
+                placeholder="número, cidade ou solicitante..."
+              ></b-form-input>
             </b-form>
 
             <b-button
@@ -68,16 +83,16 @@
               variant="danger"
               class="ml-1"
               v-b-popover.hover.top="'Pesquisar processo digitado'"
-              @click="emitToParent(number)"
+              @click="emitNumberToParent(number)"
             >
-              <i class="fas fa-search"></i>
+              <i class="fa fa-search"></i>
             </b-button>
 
             <b-button
               size="sm"
               style="border-style: solid; border-color: #ffffff9e; border-size: 1px; background-color: red"
               v-b-popover.hover.top="'Listar todas os processos'"
-              @click="emitToParent('')"
+              @click="emitNumberToParent('all')"
               class="ml-1"
             >
               <i class="fab fa-buffer fa-lg"></i>
@@ -109,6 +124,9 @@
             <b-dropdown-item href="#" @click="navigate('/admin/users/profile')">
               <i class="fa fa-user-circle admin-icon"></i> Perfil
             </b-dropdown-item>
+            <b-dropdown-item href="#" @click="emitUserToParent()">
+              <i class="fa fa-th-list admin-icon"></i> Meus processos
+            </b-dropdown-item>
             <b-dropdown-item href="#" @click="logout()">
               <i class="fas fa-sign-out-alt admin-icon"></i> Sair
             </b-dropdown-item>
@@ -137,7 +155,6 @@ export default {
     };
   },
   methods: {
-    
     navigate(link) {
       this.$router.push(link);
     },
@@ -155,7 +172,7 @@ export default {
         return "isNotThePageClass";
       }
     },
-    
+
     loadDivisions() {
       const url = `${baseApiUrl}/divisions`;
       axios.get(url).then(res => {
@@ -173,17 +190,25 @@ export default {
       });
     },
 
-     emitToParent (number) {
-      this.$router.push({ name: "process", params: { number } });
-      this.$emit('childToParent', number)
-      this.number = '';
+    emitUserToParent() {
+      let passedParam = "mine";
+      if (passedParam) {
+        this.$router.push({ name: "process", params: { passedParam } });
+        this.$emit("childToParent", passedParam);
+      }
     },
 
-    showValue() {
-      alert(this.number)
+    emitNumberToParent(passedParam) {
+      if (passedParam) {
+        this.$router.push({ name: "process", params: { passedParam } });
+        this.$emit("childToParent", passedParam);
+        this.number = "";
+      } else {
+        this.$toasted.global.defaultWarning({
+          msg: `Informe algum parâmetro de busca: número do processo, cidade ou solicitante.`
+        });
+      }
     }
-
-
   },
   mounted() {
     if (this.user) {
