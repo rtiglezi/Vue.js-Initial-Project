@@ -5,68 +5,75 @@
     <PageTitle main="progresses" />
 
     <div>
-      <b-button v-b-toggle.collapse-3 class="m-1" variant="link">
-        <i class="fas fa-search mr-1"></i>pesquisar
-      </b-button>
-      <b-collapse visible id="collapse-3">
-        <b-card style="background-color: #eee">
-          <b-row>
-            <b-col>
-              Demanda:
-              <b-form-select v-model="demand" @change="getStages($event)">
-                <option
-                  v-for="demand in demands"
-                  :value="demand._id"
-                  :key="demand._id"
-                >{{demand.name}}</option>
+      <b-card style="background-color: #eee">
+        <b-row>
+          <b-col>
+            Demanda:
+            <b-form-select v-model="demand" @change="getStages($event)" size="sm">
+              <option :value="null">Todas</option>
+              <option
+                v-for="demand in demands"
+                :value="demand._id"
+                :key="demand._id"
+              >{{demand.name}}</option>
+            </b-form-select>
+          </b-col>
+
+          <b-col>
+            <div v-if="demand">
+              Etapa:
+              <b-form-select v-model="stage" @change="chooseResults($event)" size="sm">
+                <option :value="null">Todas</option>
+                <option v-for="stage in stages" :value="stage._id" :key="stage._id">{{stage.name}}</option>
               </b-form-select>
-            </b-col>
+            </div>
+          </b-col>
 
-            <b-col>
-              <div v-if="demand">
-                Etapa:
-                <b-form-select v-model="stage" @change="chooseResults($event)">
-                  <option v-for="stage in stages" :value="stage._id" :key="stage._id">{{stage.name}}</option>
-                </b-form-select>
-              </div>
-            </b-col>
-
-            <b-col>
-              <div v-if="results.length>0">
-                Resultado(s):
-                <br />
-                <MultiSelect
-                  style="width:100%"
-                  v-model="selectedResults"
-                  :options="results"
-                  optionLabel="name"
-                  placeholder="Selecione o(s) Resultados(s)"
-                  :disabled="results.length<1"
-                  @change="setArrayResultsIds()"
-                />
-              </div>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col>
-              Usuário(s):
+          <b-col>
+            <div v-if="results.length>0">
+              Resultado(s):
               <br />
               <MultiSelect
-                style="width:100%"
-                v-model="selectedUsers"
-                :options="users"
+                style="width:100%; height: 31px"
+                v-model="selectedResults"
+                :options="results"
                 optionLabel="name"
-                placeholder="Selecione o(s) Usuário(s)"
+                placeholder="Selecione o(s) Resultados(s)"
+                :disabled="results.length<1"
+                @change="setArrayResultsIds()"
               />
-            </b-col>
-          </b-row>
-        </b-card>
-      </b-collapse>
+            </div>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            Usuário(s):
+            <br />
+            <MultiSelect
+              style="width:100%; height: 31px"
+              v-model="selectedUsers"
+              :options="users"
+              optionLabel="name"
+              placeholder="Selecione o(s) Usuário(s)"
+            />
+          </b-col>
+        </b-row>
+      </b-card>
     </div>
+
+    <b-button
+      class="mt-3"
+      @click="demand=null; 
+                      stage=null;
+                      results=[];
+                      selectedResults=[]; 
+                      getDemands();
+                      getProgresses()"
+    >limpar dados</b-button>
 
     <hr />
 
-    <div class="layer-total">Histórico de ocorrências</div>
+    <div class="layer-total">Histórico de ocorrências | {{ totalRows }} registro(s)</div>
 
     <div>
       <b-table id="my-table" :items="progresses" :fields="items" responsive small>
@@ -214,19 +221,28 @@ export default {
     },
 
     getStages(demand) {
+      this.demand = demand;
       this.results = [];
-      this.getProgresses({ key: "demand", value: demand });
-      const url = `${baseApiUrl}/demands/${demand}/stages`;
-      axios.get(url).then(res => {
-        this.stages = res.data;
-      });
+      if (demand) {
+        this.getProgresses({ key: "demand", value: demand });
+        const url = `${baseApiUrl}/demands/${demand}/stages`;
+        axios.get(url).then(res => {
+          this.stages = res.data;
+        });
+      } else {
+        this.getProgresses();
+      }
     },
 
     chooseResults(stage) {
-      this.getProgresses({ key: "stage", value: stage });
-      let st = {};
-      st = this.stages.filter(x => x._id === stage);
-      this.results = st[0].results;
+      if (stage) {
+        this.getProgresses({ key: "stage", value: stage });
+        let st = {};
+        st = this.stages.filter(x => x._id === stage);
+        this.results = st[0].results;
+      } else {
+        this.getProgresses({ key: "demand", value: this.demand });
+      }
     },
 
     setArrayResultsIds() {
@@ -235,16 +251,18 @@ export default {
         this.arrayResultsIds.push(r._id);
       });
       const url = `${baseApiUrl}/progresses`;
-      axios.get(url, {params: {"stage": this.stage, "rIds": this.arrayResultsIds}}).then(res => {
-        this.progresses = res.data;
-        if (res.data) {
-          this.totalRows = res.data.length;
-          this.progresses.sort((a, b) =>
-            a.updated_at > b.updated_at ? 1 : -1
-          );
-          this.progresses = this.progresses.reverse();
-        }
-      });
+      axios
+        .get(url, { params: { stage: this.stage, rIds: this.arrayResultsIds } })
+        .then(res => {
+          this.progresses = res.data;
+          if (res.data) {
+            this.totalRows = res.data.length;
+            this.progresses.sort((a, b) =>
+              a.updated_at > b.updated_at ? 1 : -1
+            );
+            this.progresses = this.progresses.reverse();
+          }
+        });
     },
 
     getUsers() {
